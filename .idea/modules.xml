@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Project-Starter.iml" filepath="$PROJECT_DIR$/Project-Starter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JVault.iml" filepath="$PROJECT_DIR$/JVault.iml" />
     </modules>
   </component>
 </project>
