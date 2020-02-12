@@ -1,9 +1,11 @@
 package com.yangrichard.io;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
+
+import java.io.*;
 
 public class Reader {
 
@@ -17,6 +19,12 @@ public class Reader {
         int numBytes = in.read(inputBytes);
         in.close();
         return inputBytes;
+    }
+
+    // EFFECTS: reads JSON data from file
+    public static JsonObject readJson(File inputFile) throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.fromJson(new JsonReader(new FileReader(inputFile)), JsonObject.class);
     }
 
 }
