@@ -8,9 +8,9 @@ public class VaultDirectory extends VaultEntry {
     private ArrayList<VaultEntry> entries;
 
     // EFFECTS: constructs new directory with given name and zero size
-    public VaultDirectory(String name) {
+    public VaultDirectory(String name, String encryptedName) {
+        super(name, encryptedName);
         entries = new ArrayList<>();
-        this.name = name;
         this.size = 0;
     }
 
@@ -40,6 +40,20 @@ public class VaultDirectory extends VaultEntry {
 
     public ArrayList<VaultEntry> getEntries() {
         return entries;
+    }
+
+    // EFFECTS: recursively finds path of entry relative to current directory
+    public String getPathOfEntry(VaultEntry target) {
+        for (VaultEntry entry : entries) {
+            if (entry.getClass().equals(VaultDirectory.class)) {
+                return entry.getEncryptedName() + "/" + ((VaultDirectory) entry).getPathOfEntry(target);
+            } else {
+                if (entry.equals(target)) {
+                    return entry.getEncryptedName();
+                }
+            }
+        }
+        return null;
     }
 
 }
