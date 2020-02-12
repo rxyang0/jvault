@@ -34,7 +34,7 @@ public class CryptoProviderTest {
     public void testGenerateKeyFromPassword() {
         SecretKey testKey = null;
         try {
-            testKey = crypto.generateKeyFromPassword();
+            testKey = CryptoProvider.generateKeyFromPassword(password, CryptoProvider.generateSecureBytes(16));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             fail(e);
         }

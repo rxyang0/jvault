@@ -51,7 +51,7 @@ public class CryptoProvider {
     }
 
     // EFFECTS: create a key from the given password and a generated salt
-    protected SecretKey generateKeyFromPassword(char[] password, byte[] salt)
+    protected static SecretKey generateKeyFromPassword(char[] password, byte[] salt)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Define new password-based encryption specification based on these parameters
         PBEKeySpec spec = new PBEKeySpec(password, salt, ITERATION_COUNT, KEY_LENGTH);
