@@ -49,10 +49,11 @@ public class CryptoProviderTest {
     @Test
     public void testEncryptDecryptCorrectPassword() {
         byte[] encryptedData = encryptTestData();   // implicitly tests encrypt method
+        byte[] lastSaltAndIV = crypto.getLastSaltAndIV();
         runBefore();    // reset CryptoProvider to emulate restart of program
 
         try {
-            byte[] decryptedData = crypto.decrypt(encryptedData);
+            byte[] decryptedData = crypto.decrypt(encryptedData, lastSaltAndIV);
             assertEquals(new String(SECRET_DATA), new String(decryptedData));
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
@@ -63,11 +64,12 @@ public class CryptoProviderTest {
     @Test
     public void testEncryptDecryptIncorrectPassword() {
         byte[] encryptedData = encryptTestData();   // implicitly tests encrypt method
+        byte[] lastSaltAndIV = crypto.getLastSaltAndIV();
         runBefore();    // reset CryptoProvider to emulate restart of program
         crypto.setPassword((String.valueOf(PASSWORD) + "incorrect").toCharArray());  // set incorrect password
 
         try {
-            crypto.decrypt(encryptedData);
+            crypto.decrypt(encryptedData, lastSaltAndIV);
             fail("Error in decryption");
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
