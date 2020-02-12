@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class VaultFileTest {
 
     private static final String FILE_NAME = "test";
+    private static final String FILE_NAME_ENCRYPTED = "qwerty";
     private static final String FILE_EXTENSION = "txt";
     private static final int FILE_SIZE = 1024;
 
@@ -15,15 +16,15 @@ public class VaultFileTest {
 
     @BeforeEach
     public void runBefore() {
-        file = new VaultFile(FILE_NAME, FILE_EXTENSION, FILE_SIZE);
+        file = new VaultFile(FILE_NAME, FILE_NAME_ENCRYPTED, FILE_EXTENSION, FILE_SIZE);
     }
 
     @Test
     public void testConstructor() {
         assertEquals(FILE_NAME, file.getName());
+        assertEquals(FILE_NAME_ENCRYPTED, file.getEncryptedName());
         assertEquals(FILE_EXTENSION, file.getExtension());
         assertEquals(FILE_SIZE, file.size());
-        assertNotNull(file.getId());
     }
 
 }
