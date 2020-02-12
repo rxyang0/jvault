@@ -27,3 +27,13 @@ For users who are concerned with protecting sensitive data from unauthorized acc
 mediums, JVault provides a lightweight implementation to efficiently encrypt and store files with minor adjustments to
 productivity workflow. As an example, students who wish to share local files with a USB flash drive can create a JVault
 encrypted container and add files using the utility, rather than directly copying onto the drive.
+
+## User Stories
+As a user, I want to be able to:
+- encrypt or decrypt a single file with a given password and a chosen encryption scheme via the command line
+- create an "encrypted container" (vault) with a decryption password to store files in
+- add files (by means of selection or drag-and-drop) to the vault to encrypt and securely store them
+- decrypt and save files stored in the vault (by means of selection or drag-and-drop) into a local folder
+- create folders within the vault to organize files
+- add and save entire folders to/from the vault
+- change the password to a single file or vault
