@@ -9,7 +9,7 @@ public class Vault {
     // EFFECTS: creates new vault filesystem with path in host filesystem and empty root
     public Vault(String pathToVault) {
         this.pathToVault = pathToVault;
-        root = new VaultDirectory();
+        root = new VaultDirectory("Root");
     }
 
     public String getPathToVault() {
