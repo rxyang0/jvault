@@ -1,8 +1,11 @@
 package com.yangrichard.util;
 
 import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -15,6 +18,8 @@ public class CryptoProvider {
     private static final int KEY_LENGTH = 256;
     private static final int SALT_LENGTH = 16;
     private static final String CIPHER_METHOD = "AES/GCM/NoPadding";
+    private static final int GCM_TAG_LENGTH = 128;
+    private static final int IV_LENGTH = 16;
 
     private char[] password;
     private Cipher cipher;
@@ -23,6 +28,15 @@ public class CryptoProvider {
     public CryptoProvider(char[] password) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.password = password;
         cipher = Cipher.getInstance(CIPHER_METHOD);
+    }
+
+    // EFFECTS: uses a generated secret key to encrypt binary data with AES-GCM
+    public byte[] encrypt(byte[] input) throws InvalidKeySpecException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        SecretKey key = generateKeyFromPassword();
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, generateSecureBytes(IV_LENGTH)));
+
+        return cipher.doFinal(input);
     }
 
     // EFFECTS: create a key from the given password and a generated salt
