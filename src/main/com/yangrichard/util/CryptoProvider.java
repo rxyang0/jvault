@@ -88,6 +88,13 @@ public class CryptoProvider {
         this.password = password;
     }
 
+    // MODIFIES: this
+    // EFFECTS: sets password and lastSaltAndIV to null to protect data
+    public void destroy() {
+        password = null;
+        lastSaltAndIV = null;
+    }
+
     public byte[] getLastSaltAndIV() {
         return lastSaltAndIV;
     }
