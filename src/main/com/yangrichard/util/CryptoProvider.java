@@ -50,6 +50,23 @@ public class CryptoProvider {
         return combined;
     }
 
+    // EFFECTS: regenerates key from password and salt, and uses it with same IV to decrypt data
+    public byte[] decrypt(byte[] input) throws InvalidKeySpecException, NoSuchAlgorithmException,
+            InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        // Separate input data into iv, salt, and encrypted data (references constant IV_LENGTH and SALT_LENGTH)
+        byte[] iv = new byte[IV_LENGTH];
+        System.arraycopy(input, 0, iv, 0, IV_LENGTH);
+        byte[] salt = new byte[SALT_LENGTH];
+        System.arraycopy(input, IV_LENGTH, salt, 0, SALT_LENGTH);
+        byte[] data = new byte[input.length - IV_LENGTH - SALT_LENGTH];
+        System.arraycopy(input, IV_LENGTH + SALT_LENGTH, data, 0, data.length);
+
+        SecretKey key = generateKeyFromPassword(password, salt);
+        cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, iv));
+
+        return cipher.doFinal(data);
+    }
+
     // EFFECTS: create a key from the given password and a generated salt
     protected static SecretKey generateKeyFromPassword(char[] password, byte[] salt)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
