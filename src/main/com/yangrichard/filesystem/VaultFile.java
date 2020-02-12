@@ -6,8 +6,8 @@ public class VaultFile extends VaultEntry {
     private String extension;   // without period
 
     // EFFECTS: constructs VaultFile with name, extension, and size
-    public VaultFile(String name, String extension, int size) {
-        this.name = name;
+    public VaultFile(String name, String encryptedName, String extension, int size) {
+        super(name, encryptedName);
         this.extension = extension;
         this.size = size;
     }
