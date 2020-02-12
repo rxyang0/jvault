@@ -22,8 +22,7 @@ public class CryptoProvider {
     private static final int IV_LENGTH = 16;
 
     private char[] password;
-    private byte[] lastSalt;
-    private byte[] lastIV;
+    private byte[] lastSaltAndIV;
     private Cipher cipher;
 
     // EFFECTS: stores password and instantiates new cipher
@@ -35,19 +34,31 @@ public class CryptoProvider {
     // EFFECTS: uses a generated secret key to encrypt binary data with AES-GCM
     public byte[] encrypt(byte[] input) throws InvalidKeySpecException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        lastSalt = generateSecureBytes(SALT_LENGTH);
-        lastIV = generateSecureBytes(IV_LENGTH);
+        byte[] salt = generateSecureBytes(SALT_LENGTH);
+        byte[] iv = generateSecureBytes(IV_LENGTH);
 
-        SecretKey key = generateKeyFromPassword(password, lastSalt);
-        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, lastIV));
+        // Merge salt and IV into one byte array
+        lastSaltAndIV = new byte[salt.length + iv.length];
+        System.arraycopy(salt, 0, lastSaltAndIV, 0, salt.length);
+        System.arraycopy(iv, 0, lastSaltAndIV, salt.length, iv.length);
+
+        SecretKey key = generateKeyFromPassword(password, salt);
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, iv));
 
         return cipher.doFinal(input);
     }
 
     // EFFECTS: regenerates key from password and salt, and uses it with same IV to decrypt data
-    public byte[] decrypt(byte[] input, byte[] salt, byte[] iv) throws InvalidKeySpecException,
+    public byte[] decrypt(byte[] input, byte[] saltAndIV) throws InvalidKeySpecException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException,
             IllegalBlockSizeException {
+        // Split saltAndIV
+        byte[] salt = new byte[SALT_LENGTH];
+        byte[] iv = new byte[IV_LENGTH];
+        System.arraycopy(saltAndIV, 0, salt, 0, SALT_LENGTH);
+        System.arraycopy(saltAndIV, SALT_LENGTH, iv, 0, IV_LENGTH);
+
+
         SecretKey key = generateKeyFromPassword(password, salt);
         cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, iv));
 
@@ -77,12 +88,8 @@ public class CryptoProvider {
         this.password = password;
     }
 
-    public byte[] getLastSalt() {
-        return lastSalt;
-    }
-
-    public byte[] getLastIV() {
-        return lastIV;
+    public byte[] getLastSaltAndIV() {
+        return lastSaltAndIV;
     }
 
 }
