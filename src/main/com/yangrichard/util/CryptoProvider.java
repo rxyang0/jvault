@@ -33,16 +33,28 @@ public class CryptoProvider {
     // EFFECTS: uses a generated secret key to encrypt binary data with AES-GCM
     public byte[] encrypt(byte[] input) throws InvalidKeySpecException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        SecretKey key = generateKeyFromPassword();
-        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, generateSecureBytes(IV_LENGTH)));
+        byte[] salt = generateSecureBytes(SALT_LENGTH);
+        byte[] iv = generateSecureBytes(IV_LENGTH);
 
-        return cipher.doFinal(input);
+        SecretKey key = generateKeyFromPassword(password, salt);
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH, iv));
+
+        byte[] data = cipher.doFinal(input);
+
+        // Create new byte array of longer length and copy in IV, salt, and encrypted data in that order
+        byte[] combined = new byte[IV_LENGTH + SALT_LENGTH + data.length];
+        System.arraycopy(iv, 0, combined, 0, IV_LENGTH);
+        System.arraycopy(salt, 0, combined, IV_LENGTH, SALT_LENGTH);
+        System.arraycopy(data, 0, combined, IV_LENGTH + SALT_LENGTH, data.length);
+
+        return combined;
     }
 
     // EFFECTS: create a key from the given password and a generated salt
-    protected SecretKey generateKeyFromPassword() throws NoSuchAlgorithmException, InvalidKeySpecException {
+    protected SecretKey generateKeyFromPassword(char[] password, byte[] salt)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Define new password-based encryption specification based on these parameters
-        PBEKeySpec spec = new PBEKeySpec(password, generateSecureBytes(SALT_LENGTH), ITERATION_COUNT, KEY_LENGTH);
+        PBEKeySpec spec = new PBEKeySpec(password, salt, ITERATION_COUNT, KEY_LENGTH);
         // Use a secret-key factory to construct a key
         SecretKeyFactory skf = SecretKeyFactory.getInstance(KEY_METHOD);
         return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), "AES");
