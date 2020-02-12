@@ -1,5 +1,8 @@
 package com.yangrichard.filesystem;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 
 // Represents a directory entry that can either be the root directory of the vault, or a subdirectory
@@ -54,6 +57,23 @@ public class VaultDirectory extends VaultEntry {
             }
         }
         return null;
+    }
+
+    // EFFECTS: returns JsonObject containing data of this directory and all entries
+    @Override
+    public JsonObject toJson() {
+        JsonObject dirJson = new JsonObject();
+        dirJson.addProperty("name", name);
+        dirJson.addProperty("encryptedName", encryptedName);
+        dirJson.addProperty("size", size);
+
+        JsonArray entriesJson = new JsonArray();
+        dirJson.add("entries", entriesJson);
+        for (VaultEntry entry : entries) {
+            entriesJson.add(entry.toJson());
+        }
+
+        return dirJson;
     }
 
 }

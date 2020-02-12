@@ -1,5 +1,7 @@
 package com.yangrichard.filesystem;
 
+import com.google.gson.JsonObject;
+
 import java.io.*;
 
 // Handles all filesystem entries and functionality in a vault
@@ -45,6 +47,13 @@ public class Vault {
     public void saveFile(VaultFile file, File outputDir) {
         File encrypted = new File(vault.getAbsolutePath() + "/" + root.getPathOfEntry(file));
         // Decrypt and save to outputDir
+    }
+
+    // EFFECTS: returns JsonObject containing filesystem data of this vault
+    private JsonObject exportToJson() {
+        JsonObject obj = new JsonObject();
+        obj.add("filesystem", root.toJson());
+        return obj;
     }
 
 }

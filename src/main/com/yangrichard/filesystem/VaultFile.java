@@ -1,5 +1,7 @@
 package com.yangrichard.filesystem;
 
+import com.google.gson.JsonObject;
+
 // Represents a file entry in the vault filesystem
 public class VaultFile extends VaultEntry {
 
@@ -14,6 +16,16 @@ public class VaultFile extends VaultEntry {
 
     public String getExtension() {
         return extension;
+    }
+
+    // EFFECTS: returns JsonObject containing data this entry
+    @Override
+    public JsonObject toJson() {
+        JsonObject fileJson = new JsonObject();
+        fileJson.addProperty("name", name);
+        fileJson.addProperty("encryptedName", encryptedName);
+        fileJson.addProperty("size", size);
+        return fileJson;
     }
 
 }
