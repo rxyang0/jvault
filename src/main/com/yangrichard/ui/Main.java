@@ -11,7 +11,7 @@ public class Main {
         if (GraphicsEnvironment.isHeadless()) {
             System.exit(0);                 // no GUI implemented yet
         } else {
-            new ConsoleApp(Arrays.asList(args));    // start console interface
+            new ConsoleApp(args);                   // start console interface
         }
     }
 
