@@ -2,6 +2,7 @@ package com.yangrichard.util;
 
 import javax.crypto.*;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 // Handles all encryption and decryption processes
 public class CryptoProvider {
@@ -15,6 +16,13 @@ public class CryptoProvider {
     public CryptoProvider(char[] password) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.password = password;
         cipher = Cipher.getInstance(CIPHER_METHOD);
+    }
+
+    // EFFECTS: securely generates given number of random bytes
+    private byte[] generateSecureBytes(int num) {
+        byte[] bytes = new byte[num];
+        new SecureRandom().nextBytes(bytes);
+        return bytes;
     }
 
 }
