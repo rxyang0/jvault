@@ -26,7 +26,7 @@ public class CryptoProvider {
 
     // EFFECTS: stores password and instantiates new cipher
     public CryptoProvider(char[] password) throws NoSuchPaddingException, NoSuchAlgorithmException {
-        this.password = password;
+        setPassword(password);
         cipher = Cipher.getInstance(CIPHER_METHOD);
     }
 
@@ -82,6 +82,12 @@ public class CryptoProvider {
         byte[] bytes = new byte[num];
         new SecureRandom().nextBytes(bytes);
         return bytes;
+    }
+
+    // MODIFIES: this
+    // EFFECTS: sets password
+    protected void setPassword(char[] password) {
+        this.password = password;
     }
 
 }
