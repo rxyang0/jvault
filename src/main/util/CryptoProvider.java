@@ -1,4 +1,4 @@
-package com.yangrichard.util;
+package util;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;

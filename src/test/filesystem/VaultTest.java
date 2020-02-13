@@ -1,6 +1,7 @@
-package com.yangrichard.filesystem;
+package filesystem;
 
-import com.yangrichard.io.Reader;
+import io.Reader;
+import filesystem.Vault;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

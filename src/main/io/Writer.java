@@ -1,4 +1,4 @@
-package com.yangrichard.io;
+package io;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

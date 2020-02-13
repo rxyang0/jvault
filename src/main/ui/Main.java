@@ -1,7 +1,6 @@
-package com.yangrichard.ui;
+package ui;
 
 import java.awt.*;
-import java.util.Arrays;
 
 // Entry point into program
 public class Main {

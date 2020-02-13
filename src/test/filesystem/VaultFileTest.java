@@ -1,5 +1,6 @@
-package com.yangrichard.filesystem;
+package filesystem;
 
+import filesystem.VaultFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

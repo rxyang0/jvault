@@ -1,4 +1,4 @@
-package com.yangrichard.ui;
+package ui;
 
 import javax.swing.*;
 

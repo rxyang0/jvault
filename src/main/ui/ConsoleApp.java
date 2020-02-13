@@ -1,6 +1,6 @@
-package com.yangrichard.ui;
+package ui;
 
-import com.yangrichard.filesystem.Vault;
+import filesystem.Vault;
 import org.apache.commons.cli.*;
 
 import java.io.File;

@@ -1,7 +1,9 @@
-package com.yangrichard.filesystem;
+package filesystem;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import filesystem.VaultDirectory;
+import filesystem.VaultFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

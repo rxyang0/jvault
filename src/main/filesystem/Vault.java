@@ -1,9 +1,9 @@
-package com.yangrichard.filesystem;
+package filesystem;
 
 import com.google.gson.JsonObject;
-import com.yangrichard.io.Reader;
-import com.yangrichard.io.Writer;
-import com.yangrichard.util.CryptoProvider;
+import io.Reader;
+import io.Writer;
+import util.CryptoProvider;
 import org.apache.commons.codec.binary.Base32;
 
 import java.io.*;

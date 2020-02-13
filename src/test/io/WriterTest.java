@@ -1,8 +1,10 @@
-package com.yangrichard.io;
+package io;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import io.Reader;
+import io.Writer;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
