@@ -1,6 +1,7 @@
 package com.yangrichard.filesystem;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -22,6 +23,24 @@ public class VaultDirectory extends VaultEntry {
     public void addEntry(VaultEntry entry) {
         entries.add(entry);
         updateSize();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: recursively adds all entries from JSON
+    public void addEntries(JsonArray entries) {
+        for (JsonElement e : entries) {
+            JsonObject obj = (JsonObject) e;
+            if (((JsonObject) e).has("entries")) {
+                VaultDirectory current = new VaultDirectory(obj.get("name").getAsString(),
+                        obj.get("encryptedName").getAsString());
+                current.addEntries(obj.get("entries").getAsJsonArray());
+                this.entries.add(current);
+            } else {
+                VaultFile current = new VaultFile(obj.get("name").getAsString(), obj.get("encryptedName").getAsString(),
+                        obj.get("extension").getAsString(), obj.get("size").getAsInt());
+                this.entries.add(current);
+            }
+        }
     }
 
     // MODIFIES: this

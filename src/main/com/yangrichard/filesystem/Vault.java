@@ -1,5 +1,6 @@
 package com.yangrichard.filesystem;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.*;
@@ -16,10 +17,10 @@ public class Vault {
         vault = vaultFolder;
         if (! vaultFolder.exists()) {
             boolean mkdirs = vault.mkdirs();
-            root = new VaultDirectory("Root", "Root");
         } else {
             boolean success = unlock(password);
         }
+
     }
 
     // MODIFIES: this
@@ -31,6 +32,14 @@ public class Vault {
     // EFFECTS: locks vault by clearing password
     private void lock() {
         password = null;
+    }
+
+    // MODIFIES: this
+    // EFFECTS:
+    private void loadEntries(JsonObject filesystem) {
+        root = new VaultDirectory(filesystem.get("name").getAsString(), filesystem.get("encryptedName").getAsString());
+        root.addEntries(filesystem.get("entries").getAsJsonArray());
+        root.updateSize();
     }
 
     // MODIFIES: dir
@@ -51,9 +60,9 @@ public class Vault {
 
     // EFFECTS: returns JsonObject containing filesystem data of this vault
     private JsonObject exportToJson() {
-        JsonObject obj = new JsonObject();
-        obj.add("filesystem", root.toJson());
-        return obj;
+        JsonObject vaultObj = new JsonObject();
+        vaultObj.add("filesystem", root.toJson());
+        return vaultObj;
     }
 
 }

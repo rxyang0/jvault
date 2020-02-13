@@ -24,6 +24,7 @@ public class VaultFile extends VaultEntry {
         JsonObject fileJson = new JsonObject();
         fileJson.addProperty("name", name);
         fileJson.addProperty("encryptedName", encryptedName);
+        fileJson.addProperty("extension", extension);
         fileJson.addProperty("size", size);
         return fileJson;
     }
