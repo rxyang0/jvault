@@ -2,6 +2,9 @@ package com.yangrichard.filesystem;
 
 import com.google.gson.JsonObject;
 import com.yangrichard.io.Reader;
+import com.yangrichard.io.Writer;
+import com.yangrichard.util.CryptoProvider;
+import org.apache.commons.codec.binary.Base32;
 
 import java.io.*;
 
@@ -9,24 +12,25 @@ import java.io.*;
 public class Vault {
 
     private File vault;
+    private File dataRoot;
     private VaultDirectory root;
     private char[] password;
 
-    // REQUIRES: vaultFolder exists and is a directory
-    // EFFECTS: loads existing vault filesystem
+    // EFFECTS: loads existing vault filesystem, or creates new vault if folder does not exist
     public Vault(File vaultFolder, char[] password) throws IOException {
-        vault = vaultFolder;
-        boolean unlocked = unlock(password);
-        loadEntries(Reader.readJson(new File(vault.getAbsolutePath(), "filesystem.json")));
-    }
-
-    // REQUIRES: vaultFolder does not exist
-    // EFFECTS: creates new vault filesystem
-    public Vault(File vaultFolder, String name, char[] password) {
-        vault = vaultFolder;
-        boolean makeFolders = vault.mkdirs();
-        boolean unlocked = unlock(password);
-        root = new VaultDirectory(name, name);
+        if (vaultFolder.exists()) {
+            vault = vaultFolder;
+            boolean unlocked = unlock(password);
+            loadEntries(Reader.readJson(new File(vault.getAbsolutePath(), "filesystem.json")));
+        } else {
+            vault = vaultFolder;
+            boolean makeFolders = vault.mkdirs();
+            boolean unlocked = unlock(password);
+            root = new VaultDirectory(vaultFolder.getName(), vaultFolder.getName());
+            boolean makeDataFolder = dataRoot.mkdir();
+            save();
+        }
+        dataRoot = new File(vault, "data");
     }
 
     // MODIFIES: this
@@ -61,21 +65,42 @@ public class Vault {
         String fileName = inputFile.getName();
         String extension = fileName.substring(fileName.lastIndexOf('.'));
         VaultFile file = new VaultFile(fileName, fileName, extension, (int) inputFile.length());
-        // Encrypt and set reference to saved file
-        dir.addEntry(file);
+
+        // TODO: add file in specified VaultDirectory, rather than root
+        try {
+            CryptoProvider crypto = new CryptoProvider(password);
+            byte[] encryptedBytes = crypto.encrypt(Reader.readBytes(inputFile));
+            String encryptedFileName = new Base32().encodeAsString(crypto.getLastSaltAndIV()) + ".txt";
+            crypto.destroy();
+            File encryptedFile = new File(dataRoot.getAbsolutePath(), encryptedFileName);
+            Writer.writeBytes(encryptedBytes, encryptedFile);
+            dir.addEntry(file);
+        } catch (IOException e) {
+            System.out.println("IO error");
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Error in encryption");
+            e.printStackTrace();
+        }
     }
 
-    // EFFECTS: decrypts and saves contents of file in vault to output directory
-    public void saveFile(VaultFile file, File outputDir) {
-        File encrypted = new File(vault.getAbsolutePath() + "/" + root.getPathOfEntry(file));
-        // Decrypt and save to outputDir
+//    // EFFECTS: decrypts and saves contents of file in vault to output directory
+//    public void saveFile(VaultFile file, File outputDir) {
+//        File encrypted = new File(vault.getAbsolutePath() + "/" + root.getPathOfEntry(file));
+//        // Decrypt and save to outputDir
+//    }
+
+    // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
+    public void save() {
+        try {
+            Writer.writeJson(root.toJson(), new File(vault, "filesystem.json"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    // EFFECTS: returns JsonObject containing filesystem data of this vault
-    private JsonObject exportToJson() {
-        JsonObject vaultObj = new JsonObject();
-        vaultObj.add("filesystem", root.toJson());
-        return vaultObj;
+    public VaultDirectory getRoot() {
+        return root;
     }
 
 }
