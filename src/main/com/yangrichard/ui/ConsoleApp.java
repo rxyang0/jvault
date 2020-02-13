@@ -101,14 +101,18 @@ public class ConsoleApp {
             determineVaultOperation(params, vault);
         } else {
             System.out.println("No operation");
+            System.exit(1);
         }
-        System.exit(1);
     }
 
     // EFFECTS: handles specified vault operation from parameters
     private void determineVaultOperation(CommandLine params, Vault vault) {
         if (params.hasOption("a")) {
+            String fileName = params.getOptionValue("a");
+            System.out.println("Encrypting " + fileName + " and adding to vault");
             vault.addFile(new File(params.getOptionValue("a")), vault.getRoot());
+            System.out.println("Saving filesystem");
+            vault.save();
         } else if (params.hasOption("d")) {
             System.exit(0);
         } else if (params.hasOption("s")) {
