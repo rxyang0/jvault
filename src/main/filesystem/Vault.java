@@ -4,11 +4,11 @@ import com.google.gson.JsonObject;
 import io.Reader;
 import io.Writer;
 import util.CryptoProvider;
-import org.apache.commons.codec.binary.Base32;
 
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.UUID;
 
 // Handles all filesystem entries and functionality in a vault
@@ -42,7 +42,7 @@ public class Vault {
     protected void unlock(char[] password) {
         try {
             if (filesystem != null) {
-                crypto = new CryptoProvider(password, filesystem.get("salt").getAsString().getBytes());
+                crypto = new CryptoProvider(password, Base64.getDecoder().decode(filesystem.get("salt").getAsString()));
             } else {
                 crypto = new CryptoProvider(password);
             }
@@ -88,7 +88,10 @@ public class Vault {
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
     public void save() throws IOException {
-        new Writer(new File(vaultFolder, "filesystem.json")).writeJson(root.toJson());
+        filesystem = new JsonObject();
+        filesystem.addProperty("salt", Base64.getEncoder().encodeToString(crypto.getSalt()));
+        filesystem.add("root", root.toJson());
+        new Writer(new File(vaultFolder, "filesystem.json")).writeJson(filesystem);
     }
 
     public VaultDirectory getRoot() {
