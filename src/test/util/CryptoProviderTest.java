@@ -37,53 +37,55 @@ public class CryptoProviderTest {
     }
 
     @Test
-    public void testGenerateKey() {
-        byte[] testKey = new byte[0];
+    public void testGetKey() {
+        SecretKey testKey = null;
         try {
-            testKey = CryptoProvider.generateKey(PASSWORD);
+            testKey = crypto.getKey();
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             fail(e);
         }
-        assertNotEquals(0, testKey.length);
+        assertEquals(CryptoProvider.KEY_LENGTH / 8, testKey.getEncoded().length);
     }
 
     @Test
     public void testEncryptDecryptCorrectPassword() {
-        byte[] encryptedData = encryptTestData();   // implicitly tests encrypt method
-        byte[] lastSaltAndIV = crypto.getLastSaltAndIV();
-        runBefore();    // reset CryptoProvider to emulate restart of program
+        byte[] encrypted = encryptTestData(SECRET_DATA);        // implicitly tests encrypt method
+        byte[] salt = crypto.getSalt();                         // save salt
 
+        byte[] decrypted = new byte[0];
         try {
-            byte[] decryptedData = crypto.decrypt(encryptedData, lastSaltAndIV);
-            assertEquals(new String(SECRET_DATA), new String(decryptedData));
+            crypto = new CryptoProvider(PASSWORD, salt);        // reset CryptoProvider to simulate restart of program
+            decrypted = crypto.decrypt(encrypted);
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
-                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
-            fail("Error in decryption");
+                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException | NoSuchPaddingException e) {
+            fail(e);
         }
+        assertEquals(new String(SECRET_DATA), new String(decrypted));
     }
 
     @Test
     public void testEncryptDecryptIncorrectPassword() {
-        byte[] encryptedData = encryptTestData();   // implicitly tests encrypt method
-        byte[] lastSaltAndIV = crypto.getLastSaltAndIV();
-        runBefore();    // reset CryptoProvider to emulate restart of program
-        crypto.setPassword((String.valueOf(PASSWORD) + "incorrect").toCharArray());  // set incorrect password
+        byte[] encrypted = encryptTestData(SECRET_DATA);        // implicitly tests encrypt method
+        byte[] salt = crypto.getSalt();                         // save salt
 
+        char[] incorrect = (String.valueOf(PASSWORD) + "incorrect").toCharArray();  // set incorrect password
         try {
-            crypto.decrypt(encryptedData, lastSaltAndIV);
-            fail("Error in decryption");
+            crypto = new CryptoProvider(incorrect, salt);       // reset CryptoProvider to simulate restart of program
+            crypto.decrypt(encrypted);
+            fail();
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
-                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
+                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException | NoSuchPaddingException e) {
             // Caught successfully
         }
     }
 
-    private byte[] encryptTestData() {
+    // EFFECTS: helper method that encrypts SECRET_DATA
+    private byte[] encryptTestData(byte[] input) {
         try {
-            return crypto.encrypt(SECRET_DATA);
+            return crypto.encrypt(input);
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
                 IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
-            fail("Error in encryption");
+            fail(e);
         }
         return null;
     }
