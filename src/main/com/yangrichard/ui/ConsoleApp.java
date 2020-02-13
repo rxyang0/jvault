@@ -110,9 +110,13 @@ public class ConsoleApp {
         if (params.hasOption("a")) {
             String fileName = params.getOptionValue("a");
             System.out.println("Encrypting " + fileName + " and adding to vault");
-            vault.addFile(new File(params.getOptionValue("a")), vault.getRoot());
-            System.out.println("Saving filesystem");
-            vault.save();
+            try {
+                vault.addFile(new File(params.getOptionValue("a")), vault.getRoot());
+                System.out.println("Saving filesystem");
+                vault.save();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else if (params.hasOption("d")) {
             System.exit(0);
         } else if (params.hasOption("s")) {

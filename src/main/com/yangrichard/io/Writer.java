@@ -10,9 +10,6 @@ public class Writer {
 
     // EFFECTS: writes all bytes to file
     public static void writeBytes(byte[] outputBytes, File outputFile) throws IOException {
-        if (outputFile.isDirectory()) {
-            throw new FileNotFoundException();
-        }
         FileOutputStream out = new FileOutputStream(outputFile);
         out.write(outputBytes);
         out.close();
