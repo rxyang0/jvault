@@ -85,11 +85,19 @@ public class Vault {
         }
     }
 
-//    // EFFECTS: decrypts and saves contents of file in vault to output directory
-//    public void saveFile(VaultFile file, File outputDir) {
-//        File encrypted = new File(vault.getAbsolutePath() + "/" + root.getPathOfEntry(file));
-//        // Decrypt and save to outputDir
-//    }
+    // EFFECTS: decrypts and saves contents of file in vault root to local folder
+    public void saveFile(String fileName, File outputDir) throws IOException, CryptoException {
+        for (VaultEntry entry : root.getEntries()) {
+            if (entry.getName().equals(fileName) && entry.getClass().equals(VaultFile.class)) {
+                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
+                if (encrypted.exists()) {
+                    byte[] decrypted = crypto.decrypt(new Reader(encrypted).readBytes());
+                    new Writer(new File(outputDir, fileName)).writeBytes(decrypted);
+                }
+                break;
+            }
+        }
+    }
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
     public void save() throws IOException {

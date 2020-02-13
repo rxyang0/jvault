@@ -113,6 +113,20 @@ public class VaultTest {
         }
     }
 
+    @Test
+    public void testSaveFile() {
+        try {
+            vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
+            vault.saveFile("testReaderWriter.json", vault.dataFolder);
+
+            assertTrue(new File(vault.dataFolder, "testReaderWriter.json").exists());
+
+            vault.saveFile("", vault.dataFolder);       // Try saving non-existent file
+        } catch (IOException | CryptoException e) {
+            fail(e);
+        }
+    }
+
     @AfterAll
     public static void deleteTestVaults() {
         try {
