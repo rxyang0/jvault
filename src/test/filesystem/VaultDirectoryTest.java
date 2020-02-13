@@ -13,6 +13,13 @@ public class VaultDirectoryTest {
 
     private static final String DIR_NAME = "test";
     private static final String DIR_NAME_ENCRYPTED = "qwerty";
+    private static final JsonObject TEST_OBJ = new JsonObject();
+    static {
+        TEST_OBJ.addProperty("name", "test");
+        TEST_OBJ.addProperty("encryptedName", "test");
+        TEST_OBJ.addProperty("extension", "test");
+        TEST_OBJ.addProperty("size", 1024);
+    }
 
     private VaultDirectory directory;
 
@@ -38,19 +45,33 @@ public class VaultDirectoryTest {
     }
 
     @Test
-    public void testAddEntries() {
+    public void testAddEntriesSingleFile() {
         JsonArray testArr = new JsonArray();
-
-        JsonObject testObj = new JsonObject();
-        testObj.addProperty("name", "test");
-        testObj.addProperty("encryptedName", "test");
-        testObj.addProperty("extension", "test");
-        testObj.addProperty("size", 1024);
-
-        testArr.add(testObj);
+        testArr.add(TEST_OBJ);
         directory.addEntries(testArr);
 
         assertEquals(1, directory.getEntries().size());
+        assertEquals(TEST_OBJ.get("size").getAsInt(), directory.size());
+    }
+
+    @Test
+    public void testAddEntriesDirectory() {
+        JsonArray testArr = new JsonArray();
+
+        JsonArray testDirEntries = new JsonArray();
+        testDirEntries.add(TEST_OBJ);
+        testDirEntries.add(TEST_OBJ);
+
+        JsonObject testDir = new JsonObject();
+        testDir.addProperty("name", "test");
+        testDir.addProperty("encryptedName", "test");
+        testDir.addProperty("size", 32);
+        testDir.add("entries", testDirEntries);
+
+        testArr.add(testDir);
+        directory.addEntries(testArr);
+
+        assertEquals(TEST_OBJ.get("size").getAsInt() * 2, directory.size());
     }
 
     @Test

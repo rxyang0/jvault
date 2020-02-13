@@ -41,6 +41,7 @@ public class VaultDirectory extends VaultEntry {
                 this.entries.add(current);
             }
         }
+        updateSize();
     }
 
     // MODIFIES: this
