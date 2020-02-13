@@ -35,7 +35,7 @@ public class ReaderTest {
 
     @Test
     public void testReadJson() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try {
             assertEquals(CORRECT, gson.toJson(reader.readJson()));
         } catch (IOException e) {

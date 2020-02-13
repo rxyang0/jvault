@@ -23,7 +23,7 @@ public class Writer {
 
     // EFFECTS: writes JSON data to file
     public void writeJson(JsonObject outObj) throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         writeBytes(gson.toJson(outObj).getBytes());
     }
 

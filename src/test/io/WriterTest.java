@@ -42,7 +42,7 @@ public class WriterTest {
     public void testWriteJson() {
         JsonObject correctJson = new JsonObject();
         correctJson.addProperty("testProperty", "testValue");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try {
             writer.writeJson(correctJson);
             assertEquals(CORRECT, gson.toJson(reader.readJson()));

@@ -26,7 +26,7 @@ public class Reader {
 
     // EFFECTS: reads JSON data from file
     public JsonObject readJson() throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         return gson.fromJson(new JsonReader(new FileReader(file)), JsonObject.class);
     }
 
