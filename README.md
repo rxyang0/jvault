@@ -7,6 +7,7 @@ encryption occurs in the background. Encrypted vaults can be stored locally or s
 service. All aspects of the program are open source and client-side.
 
 ## Rationale
+
 With the growing prevalence of cybersecurity threats that account for the majority of modern-day breaches of sensitive
 data, the necessity of sufficiently secure encryption is essential. While transferring sensitive data over unencrypted
 mediums, such as a USB flash drive, is convenient and hassle-free, it unfortunately enables and increases the risk of
@@ -15,6 +16,7 @@ consuming to operate or require admin privileges in exchange for seamless and tr
 these limitations and encourage individuals to value data security.
 
 ## Features
+
 - Vault can be stored anywhere as a directory
 - Encryption key is derived from the password using PBKDF2 and hashed using HMAC SHA-256
 - Cryptographically secure 200,000 rounds of iteration, and 16 bytes for salts and IVs generated using Java
@@ -22,14 +24,26 @@ these limitations and encourage individuals to value data security.
 - AES-GCM algorithm with 256-bit key length and 128-bit tag length
 - File contents, file names, and folder names are encrypted
 
+## Security Architecture
+
+- A Vault object handles all filesystem and cryptographic functionality
+- The user's password is first strengthened using "PBKDF2WithHmacSHA256" with 16 bytes of salt, which is either randomly
+  generated or loaded from the filesystem
+- Previously generated salts must be associated and stored inside each vault's filesystem
+- Encrypted files are prepended with 16 bytes of a random IV before being written back to disk
+- File and folder names are stored in the filesystem
+
 ## Deployment
+
 For users who are concerned with protecting sensitive data from unauthorized access when transporting on unencrypted
 mediums, JVault provides a lightweight implementation to efficiently encrypt and store files with minor adjustments to
 productivity workflow. As an example, students who wish to share local files with a USB flash drive can create a JVault
 encrypted container and add files using the utility, rather than directly copying onto the drive.
 
 ## User Stories
+
 As a user, I want to be able to:
+
 - encrypt or decrypt a single file with a given password and a chosen encryption scheme via the command line
 - create an "encrypted container" (vault) with a decryption password to store files in
 - add files (by means of selection or drag-and-drop) to the vault to encrypt and securely store them
