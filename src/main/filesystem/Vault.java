@@ -70,6 +70,21 @@ public class Vault {
         dir.addEntry(file);
     }
 
+    // MODIFIES: this
+    // EFFECTS: finds and deletes file from vault root and disk
+    public void deleteFile(String fileName) {
+        for (VaultEntry entry : root.getEntries()) {
+            if (entry.getName().equals(fileName) && entry.getClass().equals(VaultFile.class)) {
+                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
+                if (encrypted.exists()) {
+                    encrypted.delete();
+                }
+                root.deleteEntry(entry);
+                break;
+            }
+        }
+    }
+
 //    // EFFECTS: decrypts and saves contents of file in vault to output directory
 //    public void saveFile(VaultFile file, File outputDir) {
 //        File encrypted = new File(vault.getAbsolutePath() + "/" + root.getPathOfEntry(file));

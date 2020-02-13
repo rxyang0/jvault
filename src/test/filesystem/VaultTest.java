@@ -96,6 +96,23 @@ public class VaultTest {
         }
     }
 
+    @Test
+    public void testDeleteFile() {
+        try {
+            byte[] original = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
+            vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
+            vault.deleteFile("");       // Try deleting non-existent file
+            vault.deleteFile("testReaderWriter.json");
+            vault.save();
+            byte[] updated = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
+
+            assertEquals(0, vault.dataFolder.listFiles().length);
+            assertEquals(new String(original), new String(updated));
+        } catch (IOException | CryptoException e) {
+            fail(e);
+        }
+    }
+
     @AfterAll
     public static void deleteTestVaults() {
         try {
