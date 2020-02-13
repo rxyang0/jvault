@@ -37,14 +37,14 @@ public class CryptoProviderTest {
     }
 
     @Test
-    public void testGenerateKeyFromPassword() {
-        SecretKey testKey = null;
+    public void testGenerateKey() {
+        byte[] testKey = new byte[0];
         try {
-            testKey = CryptoProvider.generateKeyFromPassword(PASSWORD, CryptoProvider.generateSecureBytes(16));
+            testKey = CryptoProvider.generateKey(PASSWORD);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             fail(e);
         }
-        assertNotNull(testKey);
+        assertNotEquals(0, testKey.length);
     }
 
     @Test

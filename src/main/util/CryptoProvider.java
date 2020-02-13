@@ -65,16 +65,25 @@ public class CryptoProvider {
         return cipher.doFinal(input);
     }
 
-    // EFFECTS: create a key from the given password and a generated salt
-    protected static SecretKey generateKeyFromPassword(char[] password, byte[] salt)
-            throws NoSuchAlgorithmException, InvalidKeySpecException {
+    // EFFECTS: creates a key appended with a generated salt from the given password
+    protected static byte[] generateKey(char[] password) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] salt = generateSecureBytes(SALT_LENGTH);
+
         // Define new password-based encryption specification based on these parameters
         PBEKeySpec spec = new PBEKeySpec(password, salt, ITERATION_COUNT, KEY_LENGTH);
+
         // Use a secret-key factory to construct a key
         SecretKeyFactory skf = SecretKeyFactory.getInstance(KEY_METHOD);
-        return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), "AES");
+        byte[] key = skf.generateSecret(spec).getEncoded();
+
+        // Prepend key with salt
+        byte[] saltAndKey = new byte[SALT_LENGTH + key.length];
+        System.arraycopy(salt, 0, saltAndKey, 0, salt.length);
+        System.arraycopy(key, 0, saltAndKey, salt.length, key.length);
+
+        return saltAndKey;
     }
-    
+
     // EFFECTS: securely generates given number of random bytes
     protected static byte[] generateSecureBytes(int num) {
         byte[] bytes = new byte[num];
