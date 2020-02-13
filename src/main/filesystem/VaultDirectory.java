@@ -5,18 +5,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 // Represents a directory entry that can either be the root directory of the vault, or a subdirectory
 public class VaultDirectory extends VaultEntry {
 
     private ArrayList<VaultEntry> entries;
 
-    // EFFECTS: constructs new directory with given name and zero size
+    // EFFECTS: constructs new directory with id, name, zero size, and no entries
     public VaultDirectory(String id, String name) {
         super(id, name);
-        entries = new ArrayList<>();
         this.size = 0;
+        entries = new ArrayList<>();
     }
 
     // MODIFIES: this
@@ -61,20 +60,16 @@ public class VaultDirectory extends VaultEntry {
         size = total;
     }
 
-    public ArrayList<VaultEntry> getEntries() {
-        return entries;
-    }
-
     // EFFECTS: recursively finds path of entry relative to current directory
-    public String getPathOfEntry(UUID id) {
-        if (this.id.equals(id)) {
+    public String getPathOfEntry(String id) {
+        if (this.getId().equals(id)) {
             return "";
         }
         for (VaultEntry entry : entries) {
             if (entry.getId().equals(id)) {
-                return entry.getId().toString();
+                return entry.getId();
             } else if (entry.getClass().equals(VaultDirectory.class)) {
-                return entry.getId().toString() + "/" + ((VaultDirectory) entry).getPathOfEntry(id);
+                return entry.getId() + "/" + ((VaultDirectory) entry).getPathOfEntry(id);
             }
         }
         return null;
@@ -84,8 +79,8 @@ public class VaultDirectory extends VaultEntry {
     @Override
     public JsonObject toJson() {
         JsonObject dirJson = new JsonObject();
-        dirJson.addProperty("id", id.toString());
-        dirJson.addProperty("name", name);
+        dirJson.addProperty("id", getId());
+        dirJson.addProperty("name", getName());
         dirJson.addProperty("size", size);
 
         JsonArray entriesJson = new JsonArray();
@@ -95,6 +90,10 @@ public class VaultDirectory extends VaultEntry {
         }
 
         return dirJson;
+    }
+
+    public ArrayList<VaultEntry> getEntries() {
+        return entries;
     }
 
 }

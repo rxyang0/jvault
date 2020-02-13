@@ -14,11 +14,11 @@ import java.util.UUID;
 // Handles all filesystem entries and functionality in a vault
 public class Vault {
 
-    private File vaultFolder;
-    private File dataFolder;
-    private JsonObject filesystem;
-    private VaultDirectory root;
-    private CryptoProvider crypto;
+    protected File vaultFolder;
+    protected File dataFolder;
+    protected JsonObject filesystem;
+    protected VaultDirectory root;
+    protected CryptoProvider crypto;
 
     // EFFECTS: loads existing vault filesystem, or creates new vault if folder does not exist
     public Vault(File vaultFolder, char[] password) throws IOException {

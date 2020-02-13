@@ -7,11 +7,11 @@ import java.util.UUID;
 // Contains fields and methods common to all entries in a vault filesystem (e.g. files, directories)
 public abstract class VaultEntry {
 
-    protected String name;          // plaintext name of file or directory
-    protected UUID id;
+    private String name;          // plaintext name of file or directory
+    private UUID id;
     protected int size;             // in bytes
 
-    // EFFECTS: sets random UUID
+    // EFFECTS: sets id and name
     public VaultEntry(String id, String name) {
         this.id = UUID.fromString(id);
         this.name = name;
@@ -20,16 +20,16 @@ public abstract class VaultEntry {
     // EFFECTS: returns new JsonObject or JsonArray containing data of VaultEntry
     public abstract JsonObject toJson();
 
-    public int size() {
-        return size;
+    public String getId() {
+        return id.toString();
     }
 
     public String getName() {
         return name;
     }
 
-    public UUID getId() {
-        return id;
+    public int size() {
+        return size;
     }
 
 }
