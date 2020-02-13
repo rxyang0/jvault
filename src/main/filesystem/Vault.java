@@ -16,8 +16,8 @@ public class Vault {
     private static final String rootID = "00000000-0000-0000-0000-000000000000";
     private static final String rootName = "root";
 
-    protected File vaultFolder;
-    protected File dataFolder;
+    private File vaultFolder;
+    private File dataFolder;
     protected JsonObject filesystem;
     protected VaultDirectory root;
     protected CryptoProvider crypto;
@@ -50,8 +50,9 @@ public class Vault {
     }
 
     // MODIFIES: this
-    // EFFECTS: destroys CryptoProvider
-    protected void lock() {
+    // EFFECTS: destroys CryptoProvider and saves filesystem
+    public void lock() throws IOException {
+        save();
         crypto.destroy();
     }
 
@@ -68,11 +69,13 @@ public class Vault {
 
         VaultFile file = new VaultFile(id, fileName, (int) inputFile.length());
         dir.addEntry(file);
+
+        save();
     }
 
     // MODIFIES: this
     // EFFECTS: finds and deletes file from vault root and disk
-    public void deleteFile(String fileName) {
+    public void deleteFile(String fileName) throws IOException {
         for (VaultEntry entry : root.getEntries()) {
             if (entry.getName().equals(fileName) && entry.getClass().equals(VaultFile.class)) {
                 File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
@@ -83,6 +86,8 @@ public class Vault {
                 break;
             }
         }
+
+        save();
     }
 
     // EFFECTS: decrypts and saves contents of file in vault root to local folder
@@ -105,6 +110,14 @@ public class Vault {
         filesystem.addProperty("salt", Base64.getEncoder().encodeToString(crypto.getSalt()));
         filesystem.add(rootName, root.toJson());
         new Writer(new File(vaultFolder, "filesystem.json")).writeJson(filesystem);
+    }
+
+    public File getVaultFolder() {
+        return vaultFolder;
+    }
+
+    public File getDataFolder() {
+        return dataFolder;
     }
 
     public VaultDirectory getRoot() {

@@ -36,8 +36,8 @@ public class VaultTest {
     public void testConstructorExistingVault() {
         try {
             vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
-            assertTrue(vault.vaultFolder.exists());
-            assertTrue(vault.dataFolder.exists());
+            assertTrue(vault.getVaultFolder().exists());
+            assertTrue(vault.getDataFolder().exists());
             assertNotNull(vault.filesystem);
         } catch (IOException | CryptoException e) {
             fail(e);
@@ -48,8 +48,8 @@ public class VaultTest {
     public void testConstructorCreateVault() {
         try {
             vault = new Vault(TEST_VAULT_NO_EXIST, TEST_PASSWORD);
-            assertTrue(vault.vaultFolder.exists());
-            assertTrue(vault.dataFolder.exists());
+            assertTrue(vault.getVaultFolder().exists());
+            assertTrue(vault.getDataFolder().exists());
             assertNotNull(vault.filesystem);
         } catch (IOException | CryptoException e) {
             fail(e);
@@ -75,7 +75,7 @@ public class VaultTest {
 
             vault.unlock(TEST_PASSWORD);
             assertEquals(new String(salt), new String(vault.crypto.getSalt()));
-        } catch (CryptoException e) {
+        } catch (CryptoException | IOException e) {
             fail(e);
         }
     }
@@ -106,7 +106,7 @@ public class VaultTest {
             vault.save();
             byte[] updated = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
 
-            assertEquals(0, vault.dataFolder.listFiles().length);
+            assertEquals(0, vault.getDataFolder().listFiles().length);
             assertEquals(new String(original), new String(updated));
         } catch (IOException | CryptoException e) {
             fail(e);
@@ -117,11 +117,11 @@ public class VaultTest {
     public void testSaveFile() {
         try {
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
-            vault.saveFile("testReaderWriter.json", vault.dataFolder);
+            vault.saveFile("testReaderWriter.json", vault.getDataFolder());
 
-            assertTrue(new File(vault.dataFolder, "testReaderWriter.json").exists());
+            assertTrue(new File(vault.getDataFolder(), "testReaderWriter.json").exists());
 
-            vault.saveFile("", vault.dataFolder);       // Try saving non-existent file
+            vault.saveFile("", vault.getDataFolder());       // Try saving non-existent file
         } catch (IOException | CryptoException e) {
             fail(e);
         }
