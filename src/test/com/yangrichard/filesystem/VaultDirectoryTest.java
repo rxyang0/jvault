@@ -1,9 +1,11 @@
 package com.yangrichard.filesystem;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VaultDirectoryTest {
 
@@ -31,6 +33,22 @@ public class VaultDirectoryTest {
 
         assertEquals(1, directory.getEntries().size());
         assertEquals(1024, directory.size());
+    }
+
+    @Test
+    public void testAddEntries() {
+        JsonArray testArr = new JsonArray();
+
+        JsonObject testObj = new JsonObject();
+        testObj.addProperty("name", "test");
+        testObj.addProperty("encryptedName", "test");
+        testObj.addProperty("extension", "test");
+        testObj.addProperty("size", 1024);
+
+        testArr.add(testObj);
+        directory.addEntries(testArr);
+
+        assertEquals(1, directory.getEntries().size());
     }
 
     @Test
@@ -65,6 +83,18 @@ public class VaultDirectoryTest {
 
         assertEquals("one", directory.getPathOfEntry(one));
         assertEquals("sub/two", directory.getPathOfEntry(two));
+    }
+
+    @Test
+    public void testGetPathOfEntryNotFound() {
+        VaultFile one = new VaultFile("one", "one","txt", 1024);
+
+        assertNull(directory.getPathOfEntry(one));
+    }
+
+    @Test
+    public void testToJson() {
+        assertNotNull(directory.toJson());
     }
 
 }
