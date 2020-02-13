@@ -28,7 +28,7 @@ public class Vault {
         dataFolder = new File(vaultFolder, "data");
         File filesystemFile = new File(vaultFolder, "filesystem.json");
         root = new VaultDirectory(rootID, rootName);
-        if (filesystemFile.exists() && dataFolder.exists()) {
+        if (filesystemFile.exists()) {
             filesystem = new Reader(filesystemFile).readJson();
             unlock(password);
             root.addEntries(filesystem.get(rootName).getAsJsonObject().getAsJsonArray("entries"));
@@ -77,7 +77,7 @@ public class Vault {
     // EFFECTS: finds and deletes file from vault root and disk
     public void deleteFile(String fileName) throws IOException {
         for (VaultEntry entry : root.getEntries()) {
-            if (entry.getName().equals(fileName) && entry.getClass().equals(VaultFile.class)) {
+            if (entry.getName().equals(fileName)) {
                 File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
                 if (encrypted.exists()) {
                     encrypted.delete();
@@ -93,12 +93,10 @@ public class Vault {
     // EFFECTS: decrypts and saves contents of file in vault root to local folder
     public void saveFile(String fileName, File outputDir) throws IOException, CryptoException {
         for (VaultEntry entry : root.getEntries()) {
-            if (entry.getName().equals(fileName) && entry.getClass().equals(VaultFile.class)) {
+            if (entry.getName().equals(fileName)) {
                 File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
-                if (encrypted.exists()) {
-                    byte[] decrypted = crypto.decrypt(new Reader(encrypted).readBytes());
-                    new Writer(new File(outputDir, fileName)).writeBytes(decrypted);
-                }
+                byte[] decrypted = crypto.decrypt(new Reader(encrypted).readBytes());
+                new Writer(new File(outputDir, fileName)).writeBytes(decrypted);
                 break;
             }
         }
