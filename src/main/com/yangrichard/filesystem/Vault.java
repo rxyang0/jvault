@@ -1,7 +1,7 @@
 package com.yangrichard.filesystem;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.yangrichard.io.Reader;
 
 import java.io.*;
 
@@ -12,20 +12,32 @@ public class Vault {
     private VaultDirectory root;
     private char[] password;
 
-    // EFFECTS: creates new vault filesystem with path in host filesystem and empty root
-    public Vault(File vaultFolder, char[] password) {
+    // REQUIRES: vaultFolder exists and is a directory
+    // EFFECTS: loads existing vault filesystem
+    public Vault(File vaultFolder, char[] password) throws IOException {
         vault = vaultFolder;
-        if (! vaultFolder.exists()) {
-            boolean mkdirs = vault.mkdirs();
-        } else {
-            boolean success = unlock(password);
-        }
+        boolean unlocked = unlock(password);
+        loadEntries(Reader.readJson(new File(vault.getAbsolutePath(), "filesystem.json")));
+    }
 
+    // REQUIRES: vaultFolder does not exist
+    // EFFECTS: creates new vault filesystem
+    public Vault(File vaultFolder, String name, char[] password) {
+        vault = vaultFolder;
+        boolean makeFolders = vault.mkdirs();
+        boolean unlocked = unlock(password);
+        root = new VaultDirectory(name, name);
     }
 
     // MODIFIES: this
+    // EFFECTS: decrypts filesystem and sets password
     private boolean unlock(char[] password) {
-        return false;
+        if (password != null) {
+            this.password = password;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // MODIFIES: this
@@ -34,8 +46,9 @@ public class Vault {
         password = null;
     }
 
+    // REQUIRES: filesystem has member "entries"
     // MODIFIES: this
-    // EFFECTS:
+    // EFFECTS: loads filesystem entries from JSON into root directory
     private void loadEntries(JsonObject filesystem) {
         root = new VaultDirectory(filesystem.get("name").getAsString(), filesystem.get("encryptedName").getAsString());
         root.addEntries(filesystem.get("entries").getAsJsonArray());
