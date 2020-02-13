@@ -23,8 +23,11 @@ public class VaultTest {
     public void runBefore() {
         try {
             FileUtils.deleteDirectory(TEST_VAULT_EXISTS);
-            vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
             FileUtils.deleteDirectory(TEST_VAULT_NO_EXIST);
+        } catch (IOException ignored) {
+        }
+        try {
+            vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
         } catch (IOException e) {
             fail("Load test vault error");
         }
@@ -68,12 +71,12 @@ public class VaultTest {
     @Test
     public void testAddFile() {
         try {
-            byte[] original = Reader.readBytes(new File(TEST_VAULT_EXISTS, "filesystem.json"));
+            byte[] original = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
 
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
             vault.save();
 
-            byte[] updated = Reader.readBytes(new File(TEST_VAULT_EXISTS, "filesystem.json"));
+            byte[] updated = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
 
             assertNotEquals(new String(original), new String(updated));
         } catch (Exception e) {

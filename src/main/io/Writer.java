@@ -8,17 +8,23 @@ import java.io.*;
 
 public class Writer {
 
+    private File file;
+
+    public Writer(File outputFile) {
+        file = outputFile;
+    }
+
     // EFFECTS: writes all bytes to file
-    public static void writeBytes(byte[] outputBytes, File outputFile) throws IOException {
-        FileOutputStream out = new FileOutputStream(outputFile);
+    public void writeBytes(byte[] outputBytes) throws IOException {
+        FileOutputStream out = new FileOutputStream(file);
         out.write(outputBytes);
         out.close();
     }
 
     // EFFECTS: writes JSON data to file
-    public static void writeJson(JsonObject outObj, File outputFile) throws IOException {
+    public void writeJson(JsonObject outObj) throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        writeBytes(gson.toJson(outObj).getBytes(), outputFile);
+        writeBytes(gson.toJson(outObj).getBytes());
     }
 
 }

@@ -22,7 +22,7 @@ public class Vault {
         dataRoot = new File(vault, "data");
         if (vaultFolder.exists()) {
             unlock(password);
-            loadEntries(Reader.readJson(new File(vault.getAbsolutePath(), "filesystem.json")));
+            loadEntries(new Reader(new File(vault.getAbsolutePath(), "filesystem.json")).readJson());
         } else {
             boolean makeFolders = vault.mkdirs();
             unlock(password);
@@ -62,11 +62,10 @@ public class Vault {
 
         // TODO: add file in specified VaultDirectory, rather than root
         CryptoProvider crypto = new CryptoProvider(password);
-        byte[] encryptedBytes = crypto.encrypt(Reader.readBytes(inputFile));
+        byte[] encryptedBytes = crypto.encrypt(new Reader(inputFile).readBytes());
         String encryptedFileName = new Base32().encodeAsString(crypto.getLastSaltAndIV()) + ".txt";
         crypto.destroy();
-        File encryptedFile = new File(dataRoot.getAbsolutePath(), encryptedFileName);
-        Writer.writeBytes(encryptedBytes, encryptedFile);
+        new Writer(new File(dataRoot.getAbsolutePath(), encryptedFileName)).writeBytes(encryptedBytes);
         dir.addEntry(file);
     }
 
@@ -78,7 +77,7 @@ public class Vault {
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
     public void save() throws IOException {
-        Writer.writeJson(root.toJson(), new File(vault, "filesystem.json"));
+        new Writer(new File(vault, "filesystem.json")).writeJson(root.toJson());
     }
 
     public VaultDirectory getRoot() {

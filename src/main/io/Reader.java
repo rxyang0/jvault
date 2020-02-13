@@ -9,19 +9,25 @@ import java.io.*;
 
 public class Reader {
 
+    private File file;
+
+    public Reader(File inputFile) {
+        file = inputFile;
+    }
+
     // EFFECTS: reads and returns all bytes from a file
-    public static byte[] readBytes(File inputFile) throws IOException {
-        byte[] inputBytes = new byte[(int) inputFile.length()];
-        FileInputStream in = new FileInputStream(inputFile);
+    public byte[] readBytes() throws IOException {
+        byte[] inputBytes = new byte[(int) file.length()];
+        FileInputStream in = new FileInputStream(file);
         int numBytes = in.read(inputBytes);
         in.close();
         return inputBytes;
     }
 
     // EFFECTS: reads JSON data from file
-    public static JsonObject readJson(File inputFile) throws IOException {
+    public JsonObject readJson() throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.fromJson(new JsonReader(new FileReader(inputFile)), JsonObject.class);
+        return gson.fromJson(new JsonReader(new FileReader(file)), JsonObject.class);
     }
 
 }
