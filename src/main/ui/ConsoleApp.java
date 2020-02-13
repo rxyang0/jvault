@@ -11,52 +11,53 @@ import java.io.IOException;
 public class ConsoleApp {
     /*
      * Parameter specification:
-     *      -p  <password>                                                  specifies password (required)
-     *      -c  <path to new vault>                                         create new vault
+     *      -p      <password>                              specifies password (required)
      *
-     *      -l  <path to vault>                                             loads existing vault for following options
-     *      -a <path to input file>     -o <relative path in vault>         adds input file to vault and encrypts
-     *      -d <relative path in vault>                                     deletes file from vault
-     *      -s <relative path in vault> -o <path to output file>            saves file from vault to local drive
+     *      -c      <path to new vault>                     create new vault
+     *
+     *      -v      <path to vault>                         loads existing vault for one of the following options
+     *      -l      <path in vault>                         lists entries in vault path
+     *      -a      <path to input file>                    adds file to vault
+     *      -d      <path of file in vault>                 deletes file from vault
+     *      -s      <path of file in vault>                 saves file from vault to local drive
      */
 
     // EFFECTS: proceed with operations if arguments are provided, or exit
     public ConsoleApp(String[] args) {
         CommandLine params = parseArgs(defineOptions(), args);
-        if (params.getOptions().length == 0) {
-            System.out.println("No arguments");
+
+        if (!params.hasOption("p")) {
+            System.out.println("No password");
             System.exit(1);
-        } else if (! params.hasOption("p")) {
-            System.out.println("No password specified");
-            System.exit(1);
-        } else if ((params.hasOption("a") || (params.hasOption("d")) || (params.hasOption("s")))
-                && !params.hasOption("l")) {
-            System.out.println("No vault specified");
+        } else if (params.hasOption("c")) {
+            handleCreateVault(params.getOptionValue("p").toCharArray(), params.getOptionValue("c"));
+        } else if (params.hasOption("v")) {
+            Vault vault = handleLoadVault(params.getOptionValue("p").toCharArray(), params.getOptionValue("v"));
+            determineVaultOperation(params, vault);
+        } else {
+            System.out.println("No operation");
             System.exit(1);
         }
-
-        determineOperation(params);
     }
 
     // EFFECTS: defines options for parsing command line
     private Options defineOptions() {
-        Option pass = new Option("p", true, "password");
-        Option output = new Option("o", true,"output");
+        Option password = new Option("p", true, "password");
 
         OptionGroup operations = new OptionGroup();
         operations.addOption(new Option("c", true, "create"));
-        operations.addOption(new Option("l", true, "load"));
+        operations.addOption(new Option("v", true, "load vault"));
 
         OptionGroup vaultOperations = new OptionGroup();
+        vaultOperations.addOption(new Option("l", true, "list"));
         vaultOperations.addOption(new Option("a", true, "add"));
         vaultOperations.addOption(new Option("d", true, "delete"));
         vaultOperations.addOption(new Option("s", true, "save"));
 
         Options options = new Options();
-        options.addOption(pass);
+        options.addOption(password);
         options.addOptionGroup(operations);
         options.addOptionGroup(vaultOperations);
-        options.addOption(output);
 
         return options;
     }
@@ -73,31 +74,12 @@ public class ConsoleApp {
         }
     }
 
-    // EFFECTS: handle specified operation from arguments
-    private void determineOperation(CommandLine params) {
-        if (params.hasOption("c")) {
-            handleCreateVault(params.getOptionValue("p").toCharArray(), params.getOptionValue("c"));
-        } else if (params.hasOption("l")) {
-            Vault vault = handleLoadVault(params.getOptionValue("p").toCharArray(), params.getOptionValue("l"));
-            determineVaultOperation(params, vault);
-        } else {
-            System.out.println("No operation");
-            System.exit(1);
-        }
-    }
-
     // EFFECTS: handles specified vault operation from parameters
     private void determineVaultOperation(CommandLine params, Vault vault) {
-        if (params.hasOption("a")) {
-            String fileName = params.getOptionValue("a");
-            System.out.println("Encrypting " + fileName + " and adding to vault");
-            try {
-                vault.addFile(new File(params.getOptionValue("a")), vault.getRoot());
-                System.out.println("Saving filesystem");
-                vault.save();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (params.hasOption("l")) {
+            System.exit(0);
+        } else if (params.hasOption("a")) {
+            System.exit(0);
         } else if (params.hasOption("d")) {
             System.exit(0);
         } else if (params.hasOption("s")) {
@@ -111,7 +93,7 @@ public class ConsoleApp {
     private void handleCreateVault(char[] password, String pathToVault) {
         File vaultFolder = new File(pathToVault);
         if (vaultFolder.exists()) {
-            System.out.println("Folder already exists. Abort.");
+            System.out.println("Folder already exists");
             System.exit(1);
         }
         try {
@@ -120,14 +102,15 @@ public class ConsoleApp {
             System.out.println("Error in vault creation");
             e.printStackTrace();
         }
-        System.out.println("Created new vault named " + vaultFolder.getName() + " at " + vaultFolder.getAbsolutePath());
+        System.out.println("Created new vault named \"" + vaultFolder.getName() + "\" at \""
+                + vaultFolder.getAbsolutePath() + "\"");
     }
 
     // EFFECTS: handles loading a vault
     private Vault handleLoadVault(char[] password, String pathToVault) {
         File vaultFolder = new File(pathToVault);
         if (!vaultFolder.exists()) {
-            System.out.println("Folder does not exist. Abort.");
+            System.out.println("Folder does not exist");
             System.exit(1);
         }
         Vault vault = null;
@@ -138,7 +121,8 @@ public class ConsoleApp {
             e.printStackTrace();
             System.exit(1);
         }
-        System.out.println("Loaded vault named " + vaultFolder.getName() + " at " + vaultFolder.getAbsolutePath());
+        System.out.println("Loaded vault \"" + vaultFolder.getName() + "\" at \""
+                + vaultFolder.getAbsolutePath() + "\"");
         return vault;
     }
 
