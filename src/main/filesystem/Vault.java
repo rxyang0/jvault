@@ -56,9 +56,8 @@ public class Vault {
     // MODIFIES: dir
     // EFFECTS: add encrypted contents of input file to vault directory
     public void addFile(File inputFile, VaultDirectory dir) throws Exception {
-        String fileName = inputFile.getName();
-        String extension = fileName.substring(fileName.lastIndexOf('.'));
-        VaultFile file = new VaultFile(fileName, fileName, extension, (int) inputFile.length());
+        String fileName = inputFile.getName().substring(0, inputFile.getName().lastIndexOf('.'));
+        String extension = inputFile.getName().substring(inputFile.getName().lastIndexOf('.'));
 
         // TODO: add file in specified VaultDirectory, rather than root
         CryptoProvider crypto = new CryptoProvider(password);
@@ -66,6 +65,8 @@ public class Vault {
         String encryptedFileName = new Base32().encodeAsString(crypto.getLastSaltAndIV()) + ".txt";
         crypto.destroy();
         new Writer(new File(dataRoot.getAbsolutePath(), encryptedFileName)).writeBytes(encryptedBytes);
+
+        VaultFile file = new VaultFile(fileName, encryptedFileName, extension, (int) inputFile.length());
         dir.addEntry(file);
     }
 
