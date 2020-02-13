@@ -12,8 +12,8 @@ public class VaultDirectory extends VaultEntry {
     private ArrayList<VaultEntry> entries;
 
     // EFFECTS: constructs new directory with given name and zero size
-    public VaultDirectory(String name) {
-        super(name);
+    public VaultDirectory(String id, String name) {
+        super(id, name);
         entries = new ArrayList<>();
         this.size = 0;
     }
@@ -31,12 +31,12 @@ public class VaultDirectory extends VaultEntry {
         for (JsonElement e : entries) {
             JsonObject obj = (JsonObject) e;
             if (((JsonObject) e).has("entries")) {
-                VaultDirectory current = new VaultDirectory(obj.get("name").getAsString());
+                VaultDirectory current = new VaultDirectory(obj.get("id").getAsString(), obj.get("name").getAsString());
                 current.addEntries(obj.get("entries").getAsJsonArray());
                 this.entries.add(current);
             } else {
-                VaultFile current = new VaultFile(obj.get("name").getAsString(), obj.get("extension").getAsString(),
-                        obj.get("size").getAsInt());
+                VaultFile current = new VaultFile(obj.get("id").getAsString(), obj.get("name").getAsString(),
+                        obj.get("extension").getAsString(), obj.get("size").getAsInt());
                 this.entries.add(current);
             }
         }
@@ -82,6 +82,7 @@ public class VaultDirectory extends VaultEntry {
     @Override
     public JsonObject toJson() {
         JsonObject dirJson = new JsonObject();
+        dirJson.addProperty("id", id.toString());
         dirJson.addProperty("name", name);
         dirJson.addProperty("size", size);
 

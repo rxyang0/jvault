@@ -9,17 +9,21 @@ import org.apache.commons.codec.binary.Base32;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 // Handles all filesystem entries and functionality in a vault
 public class Vault {
 
+    private File vaultFolder;
+    private File dataFolder;
     private JsonObject filesystem;
     private VaultDirectory root;
     private CryptoProvider crypto;
 
     // EFFECTS: loads existing vault filesystem, or creates new vault if folder does not exist
     public Vault(File vaultFolder, char[] password) throws IOException {
-        File dataFolder = new File(vaultFolder, "data");
+        this.vaultFolder = vaultFolder;
+        dataFolder = new File(vaultFolder, "data");
         File filesystemFile = new File(vaultFolder, "filesystem.json");
         if (filesystemFile.exists() && dataFolder.exists()) {
             filesystem = new Reader(filesystemFile).readJson();
@@ -28,7 +32,7 @@ public class Vault {
         } else {
             dataFolder.mkdirs();
             unlock(password);
-            root = new VaultDirectory(vaultFolder.getName());
+            root = new VaultDirectory("0", vaultFolder.getName());
             save();
         }
     }
@@ -57,9 +61,8 @@ public class Vault {
     // MODIFIES: this
     // EFFECTS: loads filesystem entries from JSON into root directory
     private void loadEntries(JsonObject filesystem) {
-        root = new VaultDirectory(filesystem.get("name").getAsString());
+        root = new VaultDirectory("0", filesystem.get("name").getAsString());
         root.addEntries(filesystem.get("entries").getAsJsonArray());
-        root.updateSize();
     }
 
     // MODIFIES: dir
@@ -68,14 +71,12 @@ public class Vault {
         String fileName = inputFile.getName().substring(0, inputFile.getName().lastIndexOf('.'));
         String extension = inputFile.getName().substring(inputFile.getName().lastIndexOf('.'));
 
-        // TODO: add file in specified VaultDirectory, rather than root
-        CryptoProvider crypto = new CryptoProvider(password);
-        byte[] encryptedBytes = crypto.encrypt(new Reader(inputFile).readBytes());
-        String encryptedFileName = new Base32().encodeAsString(crypto.getLastSaltAndIV()) + ".txt";
-        crypto.destroy();
-        new Writer(new File(dataRoot.getAbsolutePath(), encryptedFileName)).writeBytes(encryptedBytes);
+        byte[] encrypted = crypto.encrypt(new Reader(inputFile).readBytes());
+        String id = UUID.randomUUID().toString();
 
-        VaultFile file = new VaultFile(fileName, encryptedFileName, extension, (int) inputFile.length());
+        new Writer(new File(dataFolder, id)).writeBytes(encrypted);
+
+        VaultFile file = new VaultFile(id, fileName, extension, (int) inputFile.length());
         dir.addEntry(file);
     }
 
@@ -87,7 +88,7 @@ public class Vault {
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
     public void save() throws IOException {
-        new Writer(new File(vault, "filesystem.json")).writeJson(root.toJson());
+        new Writer(new File(vaultFolder, "filesystem.json")).writeJson(root.toJson());
     }
 
     public VaultDirectory getRoot() {
