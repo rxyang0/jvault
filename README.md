@@ -44,10 +44,10 @@ encrypted container and add files using the utility, rather than directly copyin
 
 As a user, I want to be able to:
 
-- encrypt or decrypt a single file with a given password and a chosen encryption scheme via the command line
-- create an "encrypted container" (vault) with a decryption password to store files in
-- add files (by means of selection or drag-and-drop) to the vault to encrypt and securely store them
-- decrypt and save files stored in the vault (by means of selection or drag-and-drop) into a local folder
+- create an "encrypted container" (vault) with a password to store files in
+- add files to the vault to encrypt and securely store them
+- delete files in the vault
+- decrypt and save files stored in the vault into a local folder
 - create folders within the vault to organize files
 - add and save entire folders to/from the vault
 - change the password to a single file or vault
