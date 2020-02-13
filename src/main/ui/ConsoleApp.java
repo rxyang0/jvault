@@ -1,5 +1,6 @@
 package ui;
 
+import exceptions.CryptoException;
 import filesystem.Vault;
 import org.apache.commons.cli.*;
 
@@ -147,7 +148,7 @@ public class ConsoleApp {
         }
         try {
             new Vault(vaultFolder, password);
-        } catch (IOException e) {
+        } catch (IOException | CryptoException e) {
             System.out.println("Error in vault creation");
             e.printStackTrace();
         }
@@ -164,7 +165,7 @@ public class ConsoleApp {
         Vault vault = null;
         try {
             vault = new Vault(vaultFolder, password);
-        } catch (IOException e) {
+        } catch (IOException | CryptoException e) {
             System.out.println("Error in loading vault");
             e.printStackTrace();
             System.exit(1);

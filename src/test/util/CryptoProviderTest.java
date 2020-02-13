@@ -1,17 +1,10 @@
 package util;
 
+import exceptions.CryptoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import util.CryptoProvider;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import javax.crypto.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,8 +19,79 @@ public class CryptoProviderTest {
     public void runBefore() {
         try {
             crypto = new CryptoProvider(PASSWORD);
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+        } catch (CryptoException e) {
             fail(e);
+        }
+    }
+
+    @Test
+    public void testConstructorInvalidCipherMethod() {
+        String origCipherMethod = CryptoProvider.CIPHER_METHOD;
+        CryptoProvider.CIPHER_METHOD = "";      // Invalidate cipher method
+        try {
+            crypto = new CryptoProvider(PASSWORD);
+            fail();
+        } catch (CryptoException e) {
+            // Caught successfully
+        } finally {
+            CryptoProvider.CIPHER_METHOD = origCipherMethod;
+        }
+    }
+
+    @Test
+    public void testGetKeyInvalidKeyMethod() {
+        String origKeyMethod = CryptoProvider.KEY_METHOD;
+        try {
+            CryptoProvider.KEY_METHOD = "";     // Invalidate key method
+            SecretKey testKey = crypto.getKey();
+            fail();
+        } catch (CryptoException e) {
+            // Caught successfully
+        } finally {
+            CryptoProvider.KEY_METHOD = origKeyMethod;
+        }
+    }
+
+    @Test
+    public void testEncryptDecryptCorrectPassword() {
+        byte[] encrypted = encryptTestData();                   // implicitly tests encrypt method
+        byte[] salt = crypto.getSalt();                         // save salt
+
+        byte[] decrypted = new byte[0];
+        try {
+            crypto = new CryptoProvider(PASSWORD, salt);        // reset CryptoProvider to simulate restart of program
+            decrypted = crypto.decrypt(encrypted);
+        } catch (CryptoException e) {
+            fail(e);
+        }
+        assertEquals(new String(SECRET_DATA), new String(decrypted));
+    }
+
+    @Test
+    public void testEncryptDecryptIncorrectPassword() {
+        byte[] encrypted = encryptTestData();                   // implicitly tests encrypt method
+        byte[] salt = crypto.getSalt();                         // save salt
+
+        char[] incorrect = (String.valueOf(PASSWORD) + "incorrect").toCharArray();  // set incorrect password
+        try {
+            crypto = new CryptoProvider(incorrect, salt);       // reset CryptoProvider to simulate restart of program
+            crypto.decrypt(encrypted);
+            fail();
+        } catch (CryptoException e) {
+            // Caught successfully
+        }
+    }
+
+    @Test
+    public void testEncryptInvalidAlgorithmParameters() {
+        int origGcmTagLength = CryptoProvider.GCM_TAG_LENGTH;
+        try {
+            CryptoProvider.GCM_TAG_LENGTH = 0;     // Invalidate GCM_TAG_LENGTH
+            crypto.encrypt(SECRET_DATA);
+        } catch (CryptoException e) {
+            // Caught successfully
+        } finally {
+            CryptoProvider.GCM_TAG_LENGTH = origGcmTagLength;
         }
     }
 
@@ -37,54 +101,16 @@ public class CryptoProviderTest {
     }
 
     @Test
-    public void testGetKey() {
-        SecretKey testKey = null;
-        try {
-            testKey = crypto.getKey();
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            fail(e);
-        }
-        assertEquals(CryptoProvider.KEY_LENGTH / 8, testKey.getEncoded().length);
-    }
-
-    @Test
-    public void testEncryptDecryptCorrectPassword() {
-        byte[] encrypted = encryptTestData(SECRET_DATA);        // implicitly tests encrypt method
-        byte[] salt = crypto.getSalt();                         // save salt
-
-        byte[] decrypted = new byte[0];
-        try {
-            crypto = new CryptoProvider(PASSWORD, salt);        // reset CryptoProvider to simulate restart of program
-            decrypted = crypto.decrypt(encrypted);
-        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
-                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException | NoSuchPaddingException e) {
-            fail(e);
-        }
-        assertEquals(new String(SECRET_DATA), new String(decrypted));
-    }
-
-    @Test
-    public void testEncryptDecryptIncorrectPassword() {
-        byte[] encrypted = encryptTestData(SECRET_DATA);        // implicitly tests encrypt method
-        byte[] salt = crypto.getSalt();                         // save salt
-
-        char[] incorrect = (String.valueOf(PASSWORD) + "incorrect").toCharArray();  // set incorrect password
-        try {
-            crypto = new CryptoProvider(incorrect, salt);       // reset CryptoProvider to simulate restart of program
-            crypto.decrypt(encrypted);
-            fail();
-        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
-                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException | NoSuchPaddingException e) {
-            // Caught successfully
-        }
+    public void testDestroy() {
+        crypto.destroy();
+        assertNull(crypto.getSalt());
     }
 
     // EFFECTS: helper method that encrypts SECRET_DATA
-    private byte[] encryptTestData(byte[] input) {
+    private byte[] encryptTestData() {
         try {
-            return crypto.encrypt(input);
-        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException |
-                IllegalBlockSizeException | BadPaddingException | InvalidKeySpecException e) {
+            return crypto.encrypt(SECRET_DATA);
+        } catch (CryptoException e) {
             fail(e);
         }
         return null;
