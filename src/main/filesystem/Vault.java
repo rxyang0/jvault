@@ -6,42 +6,51 @@ import io.Writer;
 import util.CryptoProvider;
 import org.apache.commons.codec.binary.Base32;
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 
 // Handles all filesystem entries and functionality in a vault
 public class Vault {
 
-    protected File vault;
-    protected File dataRoot;
+    private JsonObject filesystem;
     private VaultDirectory root;
-    protected char[] password;
+    private CryptoProvider crypto;
 
     // EFFECTS: loads existing vault filesystem, or creates new vault if folder does not exist
     public Vault(File vaultFolder, char[] password) throws IOException {
-        vault = vaultFolder;
-        dataRoot = new File(vault, "data");
-        if (vaultFolder.exists()) {
+        File dataFolder = new File(vaultFolder, "data");
+        File filesystemFile = new File(vaultFolder, "filesystem.json");
+        if (filesystemFile.exists() && dataFolder.exists()) {
+            filesystem = new Reader(filesystemFile).readJson();
             unlock(password);
-            loadEntries(new Reader(new File(vault.getAbsolutePath(), "filesystem.json")).readJson());
+            loadEntries(filesystem);
         } else {
-            boolean makeFolders = vault.mkdirs();
+            dataFolder.mkdirs();
             unlock(password);
             root = new VaultDirectory(vaultFolder.getName(), vaultFolder.getName());
-            boolean makeDataFolder = dataRoot.mkdir();
             save();
         }
     }
 
     // MODIFIES: this
-    // EFFECTS: decrypts filesystem and sets password
+    // EFFECTS: initializes CryptoProvider with password and if present, salt from filesystem
     protected void unlock(char[] password) {
-        this.password = password;
+        try {
+            if (filesystem != null) {
+                crypto = new CryptoProvider(password, filesystem.get("salt").getAsString().getBytes());
+            } else {
+                crypto = new CryptoProvider(password);
+            }
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     // MODIFIES: this
-    // EFFECTS: locks vault by clearing password
+    // EFFECTS: destroys CryptoProvider
     protected void lock() {
-        password = null;
+        crypto.destroy();
     }
 
     // REQUIRES: filesystem has member "entries"
