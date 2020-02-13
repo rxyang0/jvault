@@ -52,7 +52,9 @@ public class ConsoleApp {
         vaultOperations.addOption(new Option("l", true, "list"));
         vaultOperations.addOption(new Option("a", true, "add"));
         vaultOperations.addOption(new Option("d", true, "delete"));
-        vaultOperations.addOption(new Option("s", true, "save"));
+        Option save = new Option("s", true, "save");
+        save.setArgs(2);
+        vaultOperations.addOption(save);
 
         Options options = new Options();
         options.addOption(password);
@@ -76,20 +78,25 @@ public class ConsoleApp {
 
     // EFFECTS: handles specified vault operation from parameters
     private void determineVaultOperation(CommandLine params, Vault vault) {
-        if (params.hasOption("l")) {
-            System.exit(0);
-        } else if (params.hasOption("a")) {
-            System.exit(0);
+//        if (params.hasOption("l")) {
+//        }
+        if (params.hasOption("a")) {
+            handleAddFile(vault, params.getOptionValue("a"));
         } else if (params.hasOption("d")) {
-            System.exit(0);
+            handleDeleteFile(vault, params.getOptionValue("d"));
         } else if (params.hasOption("s")) {
-            System.exit(0);
+            handleSaveFile(vault, params.getOptionValues("s")[0], params.getOptionValues("s")[1]);
         } else {
             System.out.println("No operation for vault");
         }
+        try {
+            vault.lock();
+        } catch (IOException e) {
+            System.out.println("Error when saving vault filesystem");
+        }
     }
 
-    // EFFECTS: handles creation of vault with provided argument list
+    // EFFECTS: handles creating a vault
     private void handleCreateVault(char[] password, String pathToVault) {
         File vaultFolder = new File(pathToVault);
         if (vaultFolder.exists()) {
@@ -124,6 +131,45 @@ public class ConsoleApp {
         System.out.println("Loaded vault \"" + vaultFolder.getName() + "\" at \""
                 + vaultFolder.getAbsolutePath() + "\"");
         return vault;
+    }
+
+    // EFFECTS: handles adding a file to a vault
+    private void handleAddFile(Vault vault, String fileName) {
+        try {
+            File file = new File(fileName);
+            vault.addFile(file, vault.getRoot());
+            System.out.println("Added file \"" + file.getAbsolutePath() + "\" to root of vault \""
+                    + vault.getVaultFolder().getName() + "\"");
+        } catch (IOException e) {
+            System.out.println("Error when reading/writing file");
+        } catch (CryptoException e) {
+            System.out.println("Error in encryption");
+        }
+    }
+
+    // EFFECTS: handles deleting a file from a vault
+    private void handleDeleteFile(Vault vault, String fileName) {
+        try {
+            vault.deleteFile(fileName);
+            System.out.println("Deleted file \"" + fileName + "\" from root of vault \""
+                    + vault.getVaultFolder().getName() + "\"");
+        } catch (IOException e) {
+            System.out.println("Error when reading/writing file");
+        }
+    }
+
+    // EFFECTS: handles saving a file from a vault to a local folder
+    private void handleSaveFile(Vault vault, String fileName, String outputFolder) {
+        try {
+            File outputDir = new File(outputFolder);
+            vault.saveFile(fileName, outputDir);
+            System.out.println("Saved file \"" + fileName + "\" from root of vault \""
+                    + vault.getVaultFolder().getName() + "\" to \"" + outputDir.getAbsolutePath() + "\"");
+        } catch (IOException e) {
+            System.out.println("Error when reading/writing file");
+        } catch (CryptoException e) {
+            System.out.println("Error in encryption");
+        }
     }
 
 }
