@@ -8,8 +8,8 @@ public class VaultFile extends VaultEntry {
     private String extension;   // without period
 
     // EFFECTS: constructs VaultFile with name, extension, and size
-    public VaultFile(String name, String encryptedName, String extension, int size) {
-        super(name, encryptedName);
+    public VaultFile(String name, String extension, int size) {
+        super(name);
         this.extension = extension;
         this.size = size;
     }
@@ -23,7 +23,6 @@ public class VaultFile extends VaultEntry {
     public JsonObject toJson() {
         JsonObject fileJson = new JsonObject();
         fileJson.addProperty("name", name);
-        fileJson.addProperty("encryptedName", encryptedName);
         fileJson.addProperty("extension", extension);
         fileJson.addProperty("size", size);
         return fileJson;

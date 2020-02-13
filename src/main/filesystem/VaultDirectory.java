@@ -12,8 +12,8 @@ public class VaultDirectory extends VaultEntry {
     private ArrayList<VaultEntry> entries;
 
     // EFFECTS: constructs new directory with given name and zero size
-    public VaultDirectory(String name, String encryptedName) {
-        super(name, encryptedName);
+    public VaultDirectory(String name) {
+        super(name);
         entries = new ArrayList<>();
         this.size = 0;
     }
@@ -31,13 +31,12 @@ public class VaultDirectory extends VaultEntry {
         for (JsonElement e : entries) {
             JsonObject obj = (JsonObject) e;
             if (((JsonObject) e).has("entries")) {
-                VaultDirectory current = new VaultDirectory(obj.get("name").getAsString(),
-                        obj.get("encryptedName").getAsString());
+                VaultDirectory current = new VaultDirectory(obj.get("name").getAsString());
                 current.addEntries(obj.get("entries").getAsJsonArray());
                 this.entries.add(current);
             } else {
-                VaultFile current = new VaultFile(obj.get("name").getAsString(), obj.get("encryptedName").getAsString(),
-                        obj.get("extension").getAsString(), obj.get("size").getAsInt());
+                VaultFile current = new VaultFile(obj.get("name").getAsString(), obj.get("extension").getAsString(),
+                        obj.get("size").getAsInt());
                 this.entries.add(current);
             }
         }
@@ -69,10 +68,10 @@ public class VaultDirectory extends VaultEntry {
     public String getPathOfEntry(VaultEntry target) {
         for (VaultEntry entry : entries) {
             if (entry.getClass().equals(VaultDirectory.class)) {
-                return entry.getEncryptedName() + "/" + ((VaultDirectory) entry).getPathOfEntry(target);
+                return entry.getName() + "/" + ((VaultDirectory) entry).getPathOfEntry(target);
             } else {
                 if (entry.equals(target)) {
-                    return entry.getEncryptedName();
+                    return entry.getName();
                 }
             }
         }
@@ -84,7 +83,6 @@ public class VaultDirectory extends VaultEntry {
     public JsonObject toJson() {
         JsonObject dirJson = new JsonObject();
         dirJson.addProperty("name", name);
-        dirJson.addProperty("encryptedName", encryptedName);
         dirJson.addProperty("size", size);
 
         JsonArray entriesJson = new JsonArray();

@@ -6,13 +6,11 @@ import com.google.gson.JsonObject;
 public abstract class VaultEntry {
 
     protected String name;          // plaintext name of file or directory
-    protected String encryptedName;
     protected int size;             // in bytes
 
     // EFFECTS: sets random UUID
-    public VaultEntry(String name, String encryptedName) {
+    public VaultEntry(String name) {
         this.name = name;
-        this.encryptedName = encryptedName;
     }
 
     // EFFECTS: returns new JsonObject or JsonArray containing data of VaultEntry
@@ -24,10 +22,6 @@ public abstract class VaultEntry {
 
     public String getName() {
         return name;
-    }
-
-    public String getEncryptedName() {
-        return encryptedName;
     }
 
 }

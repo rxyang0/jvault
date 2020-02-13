@@ -28,7 +28,7 @@ public class Vault {
         } else {
             dataFolder.mkdirs();
             unlock(password);
-            root = new VaultDirectory(vaultFolder.getName(), vaultFolder.getName());
+            root = new VaultDirectory(vaultFolder.getName());
             save();
         }
     }
@@ -57,7 +57,7 @@ public class Vault {
     // MODIFIES: this
     // EFFECTS: loads filesystem entries from JSON into root directory
     private void loadEntries(JsonObject filesystem) {
-        root = new VaultDirectory(filesystem.get("name").getAsString(), filesystem.get("encryptedName").getAsString());
+        root = new VaultDirectory(filesystem.get("name").getAsString());
         root.addEntries(filesystem.get("entries").getAsJsonArray());
         root.updateSize();
     }
