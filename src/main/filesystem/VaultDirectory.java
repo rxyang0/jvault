@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 // Represents a directory entry that can either be the root directory of the vault, or a subdirectory
 public class VaultDirectory extends VaultEntry {
@@ -65,14 +66,15 @@ public class VaultDirectory extends VaultEntry {
     }
 
     // EFFECTS: recursively finds path of entry relative to current directory
-    public String getPathOfEntry(VaultEntry target) {
+    public String getPathOfEntry(UUID id) {
+        if (this.id.equals(id)) {
+            return "";
+        }
         for (VaultEntry entry : entries) {
-            if (entry.getClass().equals(VaultDirectory.class)) {
-                return entry.getName() + "/" + ((VaultDirectory) entry).getPathOfEntry(target);
-            } else {
-                if (entry.equals(target)) {
-                    return entry.getName();
-                }
+            if (entry.getId().equals(id)) {
+                return entry.getId().toString();
+            } else if (entry.getClass().equals(VaultDirectory.class)) {
+                return entry.getId().toString() + "/" + ((VaultDirectory) entry).getPathOfEntry(id);
             }
         }
         return null;
