@@ -19,7 +19,7 @@ public class VaultDirectoryTest {
     private static final String DIR_ID = TEST_ID_0;
     private static final String DIR_NAME = "test";
     private static final int DIR_SIZE = 0;
-    private static final VaultFile TEST_FILE = new VaultFile(TEST_ID_1, "test","txt", 1024);
+    private static final VaultFile TEST_FILE = new VaultFile(TEST_ID_1, "test.txt", 1024);
     private static final JsonObject TEST_OBJ_FILE = new JsonObject();
     static {
         TEST_OBJ_FILE.addProperty("id", TEST_ID_1);
@@ -109,11 +109,11 @@ public class VaultDirectoryTest {
 
     @Test
     public void testGetPathOfEntry() {
-        VaultFile one = new VaultFile(TEST_ID_1, "one","txt", 1024);
+        VaultFile one = new VaultFile(TEST_ID_1, "one.txt",1024);
         directory.addEntry(one);
 
         VaultDirectory subDir = new VaultDirectory(TEST_ID_2, DIR_NAME);
-        VaultFile two = new VaultFile(TEST_ID_3, "two", "txt", 2048);
+        VaultFile two = new VaultFile(TEST_ID_3, "two.txt", 2048);
         subDir.addEntry(two);
 
         directory.addEntry(subDir);
@@ -140,7 +140,7 @@ public class VaultDirectoryTest {
 
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-        assertEquals(524, gson.toJson(directory.toJson()).length());
+        assertEquals(476, gson.toJson(directory.toJson()).length());
     }
 
 }

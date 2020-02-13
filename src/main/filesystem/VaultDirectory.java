@@ -36,7 +36,7 @@ public class VaultDirectory extends VaultEntry {
                 this.entries.add(current);
             } else {
                 VaultFile current = new VaultFile(obj.get("id").getAsString(), obj.get("name").getAsString(),
-                        obj.get("extension").getAsString(), obj.get("size").getAsInt());
+                        obj.get("size").getAsInt());
                 this.entries.add(current);
             }
         }

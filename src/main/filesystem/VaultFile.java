@@ -5,12 +5,9 @@ import com.google.gson.JsonObject;
 // Represents a file entry in the vault filesystem
 public class VaultFile extends VaultEntry {
 
-    private String extension;   // without period
-
     // EFFECTS: sets id, name, extension, size
-    public VaultFile(String id, String name, String extension, int size) {
+    public VaultFile(String id, String name, int size) {
         super(id, name);
-        this.extension = extension;
         this.size = size;
     }
 
@@ -20,13 +17,8 @@ public class VaultFile extends VaultEntry {
         JsonObject fileJson = new JsonObject();
         fileJson.addProperty("id", getId());
         fileJson.addProperty("name", getName());
-        fileJson.addProperty("extension", extension);
         fileJson.addProperty("size", size);
         return fileJson;
-    }
-
-    public String getExtension() {
-        return extension;
     }
 
 }

@@ -58,8 +58,7 @@ public class Vault {
     // MODIFIES: dir
     // EFFECTS: add encrypted contents of input file to vault directory
     public void addFile(File inputFile, VaultDirectory dir) throws IOException, CryptoException {
-        String fileName = inputFile.getName().substring(0, inputFile.getName().lastIndexOf('.'));
-        String extension = inputFile.getName().substring(inputFile.getName().lastIndexOf('.'));
+        String fileName = inputFile.getName();
 
         byte[] encrypted = crypto.encrypt(new Reader(inputFile).readBytes());
         String id = UUID.randomUUID().toString();
@@ -67,7 +66,7 @@ public class Vault {
         String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(dir.getId());
         new Writer(new File(pathFromRoot, id)).writeBytes(encrypted);
 
-        VaultFile file = new VaultFile(id, fileName, extension, (int) inputFile.length());
+        VaultFile file = new VaultFile(id, fileName, (int) inputFile.length());
         dir.addEntry(file);
     }
 
