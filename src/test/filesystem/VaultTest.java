@@ -1,20 +1,22 @@
 package filesystem;
 
+import exceptions.CryptoException;
 import io.Reader;
-import filesystem.Vault;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class VaultTest {
 
     private static final File TEST_VAULT_EXISTS = new File("data/test-vault");
-    private static final File TEST_VAULT_NO_EXIST = new File("data/test-vault-2");
+    private static final File TEST_VAULT_NO_EXIST = new File("data/no-vault");
     private static final char[] TEST_PASSWORD = "test123".toCharArray();
 
     private Vault vault;
@@ -24,12 +26,11 @@ public class VaultTest {
         try {
             FileUtils.deleteDirectory(TEST_VAULT_EXISTS);
             FileUtils.deleteDirectory(TEST_VAULT_NO_EXIST);
-        } catch (IOException ignored) {
-        }
+        } catch (IOException ignored) {}
         try {
             vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
-        } catch (IOException e) {
-            fail("Load test vault error");
+        } catch (IOException | CryptoException e) {
+            fail(e);
         }
     }
 
@@ -37,35 +38,48 @@ public class VaultTest {
     public void testConstructorExistingVault() {
         try {
             vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
-        } catch (IOException e) {
+            assertTrue(vault.vaultFolder.exists());
+            assertTrue(vault.dataFolder.exists());
+            assertNotNull(vault.filesystem);
+        } catch (IOException | CryptoException e) {
             fail(e);
         }
-        assertNotNull(vault.vault);
-        assertNotNull(vault.dataRoot);
     }
 
     @Test
     public void testConstructorCreateVault() {
         try {
             vault = new Vault(TEST_VAULT_NO_EXIST, TEST_PASSWORD);
-        } catch (IOException e) {
+            assertTrue(vault.vaultFolder.exists());
+            assertTrue(vault.dataFolder.exists());
+            assertNotNull(vault.filesystem);
+        } catch (IOException | CryptoException e) {
             fail(e);
         }
-        assertNotNull(vault.vault);
-        assertNotNull(vault.dataRoot);
     }
 
     @Test
-    public void testUnlock() {
-        vault.unlock(TEST_PASSWORD);
-        assertEquals(vault.password, TEST_PASSWORD);
+    public void testUnlockNewSalt() {
+        try {
+            vault.unlock(TEST_PASSWORD);
+            assertNotNull(vault.crypto.getSalt());
+        } catch (CryptoException e) {
+            fail(e);
+        }
     }
 
-
     @Test
-    public void testLock() {
-        vault.lock();
-        assertNull(vault.password);
+    public void testUnlockExistingSalt() {
+        try {
+            vault.unlock(TEST_PASSWORD);
+            byte[] salt = vault.crypto.getSalt();
+            vault.lock();
+
+            vault.unlock(TEST_PASSWORD);
+            assertEquals(new String(salt), new String(vault.crypto.getSalt()));
+        } catch (CryptoException e) {
+            fail(e);
+        }
     }
 
     @Test
@@ -79,7 +93,7 @@ public class VaultTest {
             byte[] updated = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
 
             assertNotEquals(new String(original), new String(updated));
-        } catch (Exception e) {
+        } catch (IOException | CryptoException e) {
             fail(e);
         }
     }

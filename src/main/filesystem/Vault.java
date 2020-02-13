@@ -1,18 +1,20 @@
 package filesystem;
 
 import com.google.gson.JsonObject;
+import exceptions.CryptoException;
 import io.Reader;
 import io.Writer;
 import util.CryptoProvider;
 
-import javax.crypto.NoSuchPaddingException;
 import java.io.*;
-import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.UUID;
 
 // Handles all filesystem entries and functionality in a vault
 public class Vault {
+
+    private static final String rootID = "00000000-0000-0000-0000-000000000000";
+    private static final String rootName = "root";
 
     protected File vaultFolder;
     protected File dataFolder;
@@ -21,33 +23,29 @@ public class Vault {
     protected CryptoProvider crypto;
 
     // EFFECTS: loads existing vault filesystem, or creates new vault if folder does not exist
-    public Vault(File vaultFolder, char[] password) throws IOException {
+    public Vault(File vaultFolder, char[] password) throws IOException, CryptoException {
         this.vaultFolder = vaultFolder;
         dataFolder = new File(vaultFolder, "data");
         File filesystemFile = new File(vaultFolder, "filesystem.json");
+        root = new VaultDirectory(rootID, rootName);
         if (filesystemFile.exists() && dataFolder.exists()) {
             filesystem = new Reader(filesystemFile).readJson();
             unlock(password);
-            loadEntries(filesystem);
+            root.addEntries(filesystem.get(rootName).getAsJsonObject().getAsJsonArray("entries"));
         } else {
             dataFolder.mkdirs();
             unlock(password);
-            root = new VaultDirectory("0", vaultFolder.getName());
             save();
         }
     }
 
     // MODIFIES: this
     // EFFECTS: initializes CryptoProvider with password and if present, salt from filesystem
-    protected void unlock(char[] password) {
-        try {
-            if (filesystem != null) {
-                crypto = new CryptoProvider(password, Base64.getDecoder().decode(filesystem.get("salt").getAsString()));
-            } else {
-                crypto = new CryptoProvider(password);
-            }
-        } catch (NoSuchPaddingException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+    protected void unlock(char[] password) throws CryptoException {
+        if (filesystem != null) {
+            crypto = new CryptoProvider(password, Base64.getDecoder().decode(filesystem.get("salt").getAsString()));
+        } else {
+            crypto = new CryptoProvider(password);
         }
     }
 
@@ -57,17 +55,9 @@ public class Vault {
         crypto.destroy();
     }
 
-    // REQUIRES: filesystem has member "entries"
-    // MODIFIES: this
-    // EFFECTS: loads filesystem entries from JSON into root directory
-    private void loadEntries(JsonObject filesystem) {
-        root = new VaultDirectory("0", filesystem.get("name").getAsString());
-        root.addEntries(filesystem.get("entries").getAsJsonArray());
-    }
-
     // MODIFIES: dir
     // EFFECTS: add encrypted contents of input file to vault directory
-    public void addFile(File inputFile, VaultDirectory dir) throws Exception {
+    public void addFile(File inputFile, VaultDirectory dir) throws IOException, CryptoException {
         String fileName = inputFile.getName().substring(0, inputFile.getName().lastIndexOf('.'));
         String extension = inputFile.getName().substring(inputFile.getName().lastIndexOf('.'));
 
@@ -91,7 +81,7 @@ public class Vault {
     public void save() throws IOException {
         filesystem = new JsonObject();
         filesystem.addProperty("salt", Base64.getEncoder().encodeToString(crypto.getSalt()));
-        filesystem.add("root", root.toJson());
+        filesystem.add(rootName, root.toJson());
         new Writer(new File(vaultFolder, "filesystem.json")).writeJson(filesystem);
     }
 

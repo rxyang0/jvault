@@ -1,6 +1,7 @@
 package filesystem;
 
-import filesystem.VaultFile;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -8,8 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class VaultFileTest {
 
+    private static final String FILE_ID = "11111111-1111-1111-1111-111111111111";
     private static final String FILE_NAME = "test";
-    private static final String FILE_NAME_ENCRYPTED = "qwerty";
     private static final String FILE_EXTENSION = "txt";
     private static final int FILE_SIZE = 1024;
 
@@ -17,15 +18,21 @@ public class VaultFileTest {
 
     @BeforeEach
     public void runBefore() {
-        file = new VaultFile(FILE_NAME, FILE_NAME_ENCRYPTED, FILE_EXTENSION, FILE_SIZE);
+        file = new VaultFile(FILE_ID, FILE_NAME, FILE_EXTENSION, FILE_SIZE);
     }
 
     @Test
     public void testConstructor() {
+        assertEquals(FILE_ID, file.getId());
         assertEquals(FILE_NAME, file.getName());
-        assertEquals(FILE_NAME_ENCRYPTED, file.getEncryptedName());
         assertEquals(FILE_EXTENSION, file.getExtension());
         assertEquals(FILE_SIZE, file.size());
+    }
+
+    @Test
+    public void testToJson() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+        assertEquals(106, gson.toJson(file.toJson()).length());
     }
 
 }
