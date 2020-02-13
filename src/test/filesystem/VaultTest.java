@@ -3,6 +3,7 @@ package filesystem;
 import exceptions.CryptoException;
 import io.Reader;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +24,7 @@ public class VaultTest {
 
     @BeforeEach
     public void runBefore() {
-        try {
-            FileUtils.deleteDirectory(TEST_VAULT_EXISTS);
-            FileUtils.deleteDirectory(TEST_VAULT_NO_EXIST);
-        } catch (IOException ignored) {}
+        deleteTestVaults();
         try {
             vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
         } catch (IOException | CryptoException e) {
@@ -96,6 +94,16 @@ public class VaultTest {
         } catch (IOException | CryptoException e) {
             fail(e);
         }
+    }
+
+    @AfterAll
+    public static void deleteTestVaults() {
+        try {
+            FileUtils.deleteDirectory(TEST_VAULT_EXISTS);
+        } catch (IOException ignored) {}
+        try {
+            FileUtils.deleteDirectory(TEST_VAULT_NO_EXIST);
+        } catch (IOException ignored) {}
     }
 
 }
