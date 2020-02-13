@@ -74,7 +74,8 @@ public class Vault {
         byte[] encrypted = crypto.encrypt(new Reader(inputFile).readBytes());
         String id = UUID.randomUUID().toString();
 
-        new Writer(new File(dataFolder, id)).writeBytes(encrypted);
+        String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(dir.getId());
+        new Writer(new File(pathFromRoot, id)).writeBytes(encrypted);
 
         VaultFile file = new VaultFile(id, fileName, extension, (int) inputFile.length());
         dir.addEntry(file);
