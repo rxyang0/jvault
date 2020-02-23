@@ -13,12 +13,12 @@ import java.util.UUID;
 // Handles all filesystem entries and functionality in a vault
 public class Vault {
 
-    private static final String rootID = "00000000-0000-0000-0000-000000000000";
-    private static final String rootName = "root";
+    private static final String ROOT_ID = "00000000-0000-0000-0000-000000000000";
+    private static final String ROOT_NAME = "root";
 
     private File vaultFolder;
     private File dataFolder;
-    protected JsonObject filesystem;
+    private JsonObject index;       // Represents contents of .jvault JSON file
     protected VaultDirectory root;
     protected CryptoProvider crypto;
 
@@ -26,12 +26,12 @@ public class Vault {
     public Vault(File vaultFolder, char[] password) throws IOException, CryptoException {
         this.vaultFolder = vaultFolder;
         dataFolder = new File(vaultFolder, "data");
-        File filesystemFile = new File(vaultFolder, "filesystem.json");
-        root = new VaultDirectory(rootID, rootName);
-        if (filesystemFile.exists()) {
-            filesystem = new Reader(filesystemFile).readJson();
+        File jvault = new File(vaultFolder, vaultFolder.getName() + ".jvault");
+        root = new VaultDirectory(ROOT_ID, ROOT_NAME);
+        if (jvault.exists()) {
+            index = new Reader(jvault).readJson();
             unlock(password);
-            root.addEntries(filesystem.get(rootName).getAsJsonObject().getAsJsonArray("entries"));
+            root.addEntries(index.getAsJsonObject("filesystem").getAsJsonArray("entries"));
         } else {
             dataFolder.mkdirs();
             unlock(password);
@@ -42,9 +42,9 @@ public class Vault {
     // MODIFIES: this
     // EFFECTS: initializes CryptoProvider with password and if present, salt from filesystem
     protected void unlock(char[] password) throws CryptoException {
-        if (filesystem != null) {
-            JsonObject cryptoJson = filesystem.get("crypto").getAsJsonObject();
-            crypto = new CryptoProvider(password, Base64.getDecoder().decode(cryptoJson.get("salt").getAsString()));
+        if (index != null) {
+            JsonObject cryptoParams = index.getAsJsonObject("crypto");
+            crypto = new CryptoProvider(password, Base64.getDecoder().decode(cryptoParams.get("salt").getAsString()));
         } else {
             crypto = new CryptoProvider(password);
         }
@@ -105,14 +105,18 @@ public class Vault {
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
     public void save() throws IOException {
-        filesystem = new JsonObject();
-        filesystem.add("crypto", crypto.toJson());
-        filesystem.add(rootName, root.toJson());
-        new Writer(new File(vaultFolder, "filesystem.json")).writeJson(filesystem);
+        index = new JsonObject();
+        index.add("crypto", crypto.toJson());
+        index.add("filesystem", root.toJson());
+        new Writer(new File(vaultFolder, vaultFolder.getName() + ".jvault")).writeJson(index);
     }
 
     public File getVaultFolder() {
         return vaultFolder;
+    }
+
+    public JsonObject getIndex() {
+        return index;
     }
 
     public File getDataFolder() {

@@ -1,11 +1,12 @@
 package filesystem;
 
+import com.google.gson.JsonObject;
 import exceptions.CryptoException;
-import io.Reader;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.JsonProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class VaultTest {
             vault = new Vault(TEST_VAULT_EXISTS, TEST_PASSWORD);
             assertTrue(vault.getVaultFolder().exists());
             assertTrue(vault.getDataFolder().exists());
-            assertNotNull(vault.filesystem);
+            assertNotNull(vault.getIndex());
         } catch (IOException | CryptoException e) {
             fail(e);
         }
@@ -48,7 +49,7 @@ public class VaultTest {
             vault = new Vault(TEST_VAULT_NO_EXIST, TEST_PASSWORD);
             assertTrue(vault.getVaultFolder().exists());
             assertTrue(vault.getDataFolder().exists());
-            assertNotNull(vault.filesystem);
+            assertNotNull(vault.getIndex());
         } catch (IOException | CryptoException e) {
             fail(e);
         }
@@ -81,14 +82,13 @@ public class VaultTest {
     @Test
     public void testAddFile() {
         try {
-            byte[] original = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
-
+            JsonObject original = vault.getIndex();
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
             vault.save();
+            JsonObject updated = vault.getIndex();
 
-            byte[] updated = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
-
-            assertNotEquals(new String(original), new String(updated));
+            assertEquals(1, vault.getDataFolder().listFiles().length);
+            assertNotEquals(JsonProvider.GSON.toJson(original), JsonProvider.GSON.toJson(updated));
         } catch (IOException | CryptoException e) {
             fail(e);
         }
@@ -97,15 +97,15 @@ public class VaultTest {
     @Test
     public void testDeleteFile() {
         try {
-            byte[] original = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
+            JsonObject original = vault.getIndex();
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
             vault.deleteFile("");       // Try deleting non-existent file
             vault.deleteFile("testReaderWriter.json");
             vault.save();
-            byte[] updated = new Reader(new File(TEST_VAULT_EXISTS, "filesystem.json")).readBytes();
+            JsonObject updated = vault.getIndex();
 
             assertEquals(0, vault.getDataFolder().listFiles().length);
-            assertEquals(new String(original), new String(updated));
+            assertEquals(JsonProvider.GSON.toJson(original), JsonProvider.GSON.toJson(updated));
         } catch (IOException | CryptoException e) {
             fail(e);
         }
