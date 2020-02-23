@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.*;
 
+import java.util.Base64;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CryptoProviderTest {
@@ -55,7 +57,7 @@ public class CryptoProviderTest {
     @Test
     public void testEncryptDecryptCorrectPassword() {
         byte[] encrypted = encryptTestData();                   // implicitly tests encrypt method
-        byte[] salt = crypto.getSalt();                         // save salt
+        byte[] salt = Base64.getDecoder().decode(crypto.toJson().get("salt").getAsString());
 
         byte[] decrypted = new byte[0];
         try {
@@ -70,7 +72,7 @@ public class CryptoProviderTest {
     @Test
     public void testEncryptDecryptIncorrectPassword() {
         byte[] encrypted = encryptTestData();                   // implicitly tests encrypt method
-        byte[] salt = crypto.getSalt();                         // save salt
+        byte[] salt = Base64.getDecoder().decode(crypto.toJson().get("salt").getAsString());
 
         char[] incorrect = (String.valueOf(PASSWORD) + "incorrect").toCharArray();  // set incorrect password
         try {
@@ -103,7 +105,12 @@ public class CryptoProviderTest {
     @Test
     public void testDestroy() {
         crypto.destroy();
-        assertNull(crypto.getSalt());
+        try {
+            crypto.toJson();
+            fail();
+        } catch (NullPointerException e) {
+            // Caught trying to save null salt
+        }
     }
 
     // EFFECTS: helper method that encrypts SECRET_DATA

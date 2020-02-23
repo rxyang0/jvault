@@ -1,6 +1,8 @@
 package util;
 
+import com.google.gson.JsonObject;
 import exceptions.CryptoException;
+import io.Jsonable;
 
 import javax.crypto.*;
 import javax.crypto.spec.GCMParameterSpec;
@@ -11,9 +13,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 // Handles all encryption and decryption processes
-public class CryptoProvider {
+public class CryptoProvider implements Jsonable {
 
     protected static String KEY_METHOD = "PBKDF2WithHmacSHA256";
     private static final int ITERATION_COUNT = 100000;
@@ -116,8 +119,11 @@ public class CryptoProvider {
         salt = null;
     }
 
-    public byte[] getSalt() {
-        return salt;
+    @Override
+    public JsonObject toJson() {
+        JsonObject crypto = new JsonObject();
+        crypto.addProperty("salt", Base64.getEncoder().encodeToString(salt));
+        return crypto;
     }
 
 }

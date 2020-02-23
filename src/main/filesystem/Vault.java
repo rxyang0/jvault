@@ -43,7 +43,8 @@ public class Vault {
     // EFFECTS: initializes CryptoProvider with password and if present, salt from filesystem
     protected void unlock(char[] password) throws CryptoException {
         if (filesystem != null) {
-            crypto = new CryptoProvider(password, Base64.getDecoder().decode(filesystem.get("salt").getAsString()));
+            JsonObject cryptoJson = filesystem.get("crypto").getAsJsonObject();
+            crypto = new CryptoProvider(password, Base64.getDecoder().decode(cryptoJson.get("salt").getAsString()));
         } else {
             crypto = new CryptoProvider(password);
         }
@@ -105,7 +106,7 @@ public class Vault {
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
     public void save() throws IOException {
         filesystem = new JsonObject();
-        filesystem.addProperty("salt", Base64.getEncoder().encodeToString(crypto.getSalt()));
+        filesystem.add("crypto", crypto.toJson());
         filesystem.add(rootName, root.toJson());
         new Writer(new File(vaultFolder, "filesystem.json")).writeJson(filesystem);
     }

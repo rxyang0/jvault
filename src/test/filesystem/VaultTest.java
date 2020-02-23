@@ -7,10 +7,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.crypto.NoSuchPaddingException;
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -60,7 +58,7 @@ public class VaultTest {
     public void testUnlockNewSalt() {
         try {
             vault.unlock(TEST_PASSWORD);
-            assertNotNull(vault.crypto.getSalt());
+            assertNotNull(vault.crypto);
         } catch (CryptoException e) {
             fail(e);
         }
@@ -70,11 +68,11 @@ public class VaultTest {
     public void testUnlockExistingSalt() {
         try {
             vault.unlock(TEST_PASSWORD);
-            byte[] salt = vault.crypto.getSalt();
-            vault.lock();
+            String saltB64 = vault.crypto.toJson().get("salt").getAsString();
+            vault.lock();       // Destroys and clears CryptoProvider
 
             vault.unlock(TEST_PASSWORD);
-            assertEquals(new String(salt), new String(vault.crypto.getSalt()));
+            assertEquals(saltB64, vault.crypto.toJson().get("salt").getAsString());
         } catch (CryptoException | IOException e) {
             fail(e);
         }
