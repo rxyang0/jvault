@@ -80,9 +80,7 @@ public class Vault {
         for (VaultEntry entry : root.getEntries()) {
             if (entry.getName().equals(fileName)) {
                 File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
-                if (encrypted.exists()) {
-                    encrypted.delete();
-                }
+                encrypted.delete();
                 root.deleteEntry(entry);
                 break;
             }
