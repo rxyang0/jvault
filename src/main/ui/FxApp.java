@@ -10,16 +10,31 @@ public class FxApp extends Application {
 
     private static final String APP_TITLE = "JVault";
 
+    private Stage stage;
+    private GridPane window;
+
+    // MODIFIES: this
+    // EFFECTS: initializes application UI
     @Override
-    public void start(Stage mainStage) {
-        mainStage.setTitle(APP_TITLE);
-        mainStage.setResizable(false);
+    public void start(Stage stage) {
+        this.stage = stage;
+        this.stage.setTitle(APP_TITLE);
+        this.stage.setResizable(false);
 
-        GridPane mainPane = new GridPane();
+        this.window = new GridPane();
+        this.addNodes();
 
-        Scene mainScene = new Scene(mainPane, 600, 400);
-        mainStage.setScene(mainScene);
-        mainStage.show();
+        Scene scene = new Scene(window, 600, 400);
+        this.stage.setScene(scene);
+        this.stage.show();
+    }
+
+    // MODIFIES: this
+    // EFFECTS: adds elements to the window
+    private void addNodes() {
+        MenuBar menuBar = new MenuBar();
+        menuBar.prefWidthProperty().bind(stage.widthProperty());
+        window.add(menuBar, 0, 0);
     }
 
 }
