@@ -36,6 +36,9 @@ public class FxApp extends Application {
         MenuBar menuBar = new MenuBar(this);
         window.setTop(menuBar);
 
+        VaultExplorer explorer = new VaultExplorer();
+        window.setCenter(explorer);
+
         statusBar = new StatusBar();
         window.setBottom(statusBar);
     }
