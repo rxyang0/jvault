@@ -8,8 +8,12 @@ import javafx.scene.input.KeyCombination;
 
 public class MenuBar extends javafx.scene.control.MenuBar {
 
+    private FxApp parent;
+
     // EFFECTS: constructs menu bar
-    public MenuBar() {
+    public MenuBar(FxApp parent) {
+        this.parent = parent;
+
         this.setStyle("-fx-padding: 0; -fx-spacing: 0; -fx-font-size: 12px;");
         this.addFileMenu();
         this.addEditMenu();
@@ -69,6 +73,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
         CheckMenuItem showStatusBar = new CheckMenuItem("Status Bar");
         showStatusBar.setSelected(true);
+        showStatusBar.setOnAction(x -> parent.getStatusBar().setVisible(showStatusBar.isSelected()));
 
         viewMenu.getItems().addAll(showStatusBar);
         this.getMenus().add(viewMenu);

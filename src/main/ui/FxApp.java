@@ -12,6 +12,7 @@ public class FxApp extends Application {
 
     private Stage stage;
     private GridPane window;
+    private StatusBar statusBar;
 
     // MODIFIES: this
     // EFFECTS: initializes application UI
@@ -32,9 +33,16 @@ public class FxApp extends Application {
     // MODIFIES: this
     // EFFECTS: adds elements to the window
     private void addNodes() {
-        MenuBar menuBar = new MenuBar();
+        MenuBar menuBar = new MenuBar(this);
         menuBar.prefWidthProperty().bind(stage.widthProperty());
         window.add(menuBar, 0, 0);
+
+        statusBar = new StatusBar();
+        window.add(statusBar, 0, 2);
+    }
+
+    public StatusBar getStatusBar() {
+        return statusBar;
     }
 
 }
