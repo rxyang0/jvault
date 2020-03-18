@@ -14,7 +14,6 @@ public class MenuBar extends javafx.scene.control.MenuBar {
     public MenuBar(FxApp parent) {
         this.parent = parent;
 
-        this.setStyle("-fx-padding: 0; -fx-spacing: 0; -fx-font-size: 12px;");
         this.addFileMenu();
         this.addEditMenu();
         this.addViewMenu();

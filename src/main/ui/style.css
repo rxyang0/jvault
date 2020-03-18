@@ -1,0 +1,23 @@
+.menu-bar {
+    -fx-padding: 0;
+    -fx-spacing: 0;
+    -fx-font-size: 12px;
+}
+
+.text-field {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.button {
+    -fx-background-color: transparent;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-font-size: 24px;
+    -fx-text-fill: darkgray;
+    -fx-padding: 0 10 0 10;
+}
+
+.button:hover {
+    -fx-text-fill: dodgerblue;
+}

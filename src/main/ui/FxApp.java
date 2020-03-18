@@ -26,6 +26,7 @@ public class FxApp extends Application {
         this.addNodes();
 
         Scene scene = new Scene(window, 600, 400);
+        scene.getStylesheets().add("ui/style.css");
         this.stage.setScene(scene);
         this.stage.show();
     }
