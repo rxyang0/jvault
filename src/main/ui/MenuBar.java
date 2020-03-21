@@ -68,7 +68,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
         CheckMenuItem showStatusBar = new CheckMenuItem("Status Bar");
         showStatusBar.setSelected(true);
-        showStatusBar.setOnAction(x -> Window.getInstance().statusBar.setVisible(showStatusBar.isSelected()));
+        showStatusBar.setOnAction(e -> FxApp.getWindow().statusBar.setVisible(showStatusBar.isSelected()));
 
         viewMenu.getItems().addAll(showStatusBar);
         this.getMenus().add(viewMenu);
