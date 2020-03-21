@@ -8,15 +8,11 @@ import javafx.scene.input.KeyCombination;
 
 public class MenuBar extends javafx.scene.control.MenuBar {
 
-    private FxApp parent;
-
     // EFFECTS: constructs menu bar
-    public MenuBar(FxApp parent) {
-        this.parent = parent;
-
-        this.addFileMenu();
-        this.addEditMenu();
-        this.addViewMenu();
+    public MenuBar() {
+        addFileMenu();
+        addEditMenu();
+        addViewMenu();
     }
 
     // MODIFIES: this
@@ -72,7 +68,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
         CheckMenuItem showStatusBar = new CheckMenuItem("Status Bar");
         showStatusBar.setSelected(true);
-        showStatusBar.setOnAction(x -> parent.getStatusBar().setVisible(showStatusBar.isSelected()));
+        showStatusBar.setOnAction(x -> Window.getInstance().statusBar.setVisible(showStatusBar.isSelected()));
 
         viewMenu.getItems().addAll(showStatusBar);
         this.getMenus().add(viewMenu);
