@@ -15,7 +15,7 @@
     -fx-faint-focus-color: transparent;
     -fx-font-size: 24px;
     -fx-text-fill: darkgray;
-    -fx-padding: 0 10 0 10;
+    -fx-padding: 0 10 0 0;
 }
 
 .button:hover {
