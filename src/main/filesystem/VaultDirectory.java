@@ -61,16 +61,17 @@ public class VaultDirectory extends VaultEntry {
     }
 
     // EFFECTS: recursively finds path of entry relative to current directory
+    //          if useName is true, return path with names of entries; otherwise return path with IDs
     public String getPathOfEntry(String id, boolean useName) {
         if (this.getId().equals(id)) {
             return "";
         }
         for (VaultEntry entry : entries) {
+            String path = useName ? entry.getName() : entry.getId();
             if (entry.getId().equals(id)) {
-                return useName ? entry.getName() : entry.getId();
+                return path;
             } else if (entry.getClass().equals(VaultDirectory.class)) {
-                return useName ? entry.getName() : entry.getId()
-                        + "/" + ((VaultDirectory) entry).getPathOfEntry(id, useName);
+                return path + "/" + ((VaultDirectory) entry).getPathOfEntry(id, useName);
             }
         }
         return null;

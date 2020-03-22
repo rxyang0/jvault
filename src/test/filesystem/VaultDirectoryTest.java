@@ -122,6 +122,11 @@ public class VaultDirectoryTest {
         assertEquals(TEST_ID_1, directory.getPathOfEntry(TEST_ID_1, false));
         assertEquals(TEST_ID_2, directory.getPathOfEntry(TEST_ID_2, false));
         assertEquals(TEST_ID_2 + "/" + TEST_ID_3, directory.getPathOfEntry(TEST_ID_3, false));
+
+        assertEquals("", directory.getPathOfEntry(DIR_ID, true));
+        assertEquals("one.txt", directory.getPathOfEntry(TEST_ID_1, true));
+        assertEquals("test", directory.getPathOfEntry(TEST_ID_2, true));
+        assertEquals("test/two.txt", directory.getPathOfEntry(TEST_ID_3, true));
     }
 
     @Test
