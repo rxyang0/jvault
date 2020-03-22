@@ -2,6 +2,8 @@ package ui;
 
 import exceptions.CryptoException;
 import filesystem.Vault;
+import filesystem.VaultDirectory;
+import filesystem.VaultEntry;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -13,6 +15,7 @@ import javafx.scene.layout.Priority;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 // Displays navigation controls, address bar, and vault file explorer
 public class VaultExplorer extends BorderPane {
@@ -21,6 +24,7 @@ public class VaultExplorer extends BorderPane {
     private Button back;
     private TextField address;
     private ListView<String> list;
+    private VaultDirectory currentDir;
 
     // EFFECTS: adds all elements to pane
     public VaultExplorer() {
@@ -64,7 +68,9 @@ public class VaultExplorer extends BorderPane {
     }
 
     // MODIFIES: this, FxApp.getWindow()
-    // EFFECTS: creates or loads vault, then populates list of files
+    // EFFECTS: if name is null, loads existing vault at dir
+    //          else, creates new vault with name in dir,
+    //          then enables UI elements and populates list of files
     protected void loadVault(String name, File directory, String password) {
         try {
             if (name == null) {     // Load vault
@@ -83,6 +89,16 @@ public class VaultExplorer extends BorderPane {
         FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
         back.setDisable(false);
         address.setDisable(false);
+        updateList(vault.getRoot());
+    }
+
+    // MODIFIES: this
+    // EFFECTS: sets current path and repopulates list of files
+    private void updateList(VaultDirectory dir) {
+        currentDir = dir;
+        list.getItems().clear();
+        list.getItems().addAll(
+                dir.getEntries().stream().map(VaultEntry::getName).collect(Collectors.toList()));
     }
 
 }
