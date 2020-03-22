@@ -21,3 +21,21 @@
 .button:hover {
     -fx-text-fill: dodgerblue;
 }
+
+.list-view {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.list-view .list-cell:even {
+    -fx-background-color: lightgray;
+}
+
+.list-view .list-cell:odd {
+    -fx-background-color: white;
+}
+
+.list-view .list-cell:selected:odd,
+.list-view .list-cell:selected:even {
+    -fx-background-color: -fx-background;
+}

@@ -28,11 +28,13 @@ public class VaultExplorer extends BorderPane {
         addressBar.setPadding(new Insets(2, 15, 0, 10));
 
         Button back = new Button("←");
+        back.setDisable(true);
         addressBar.getChildren().add(back);
 
-        address = new TextField("No Vault Loaded");
+        address = new TextField();
         address.setEditable(false);
         address.setMouseTransparent(true);
+        address.setDisable(true);
         HBox.setHgrow(address, Priority.ALWAYS);
         addressBar.getChildren().add(address);
 
