@@ -6,6 +6,7 @@ import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 // User interface when run from console
 public class ConsoleApp {
@@ -150,9 +151,12 @@ public class ConsoleApp {
     // EFFECTS: handles deleting a file from a vault
     private void handleDeleteFile(Vault vault, String fileName) {
         try {
-            vault.deleteFile(fileName);
+            vault.delete(vault.getRoot().getEntries().stream()
+                            .filter(x -> x.getName().equals(fileName)).findFirst().get(), vault.getRoot());
             System.out.println("Deleted file \"" + fileName + "\" from root of vault \""
                     + vault.getVaultFolder().getName() + "\"");
+        } catch (NoSuchElementException e) {
+            System.out.println("Non-existent file");
         } catch (IOException e) {
             System.out.println("Error when reading/writing file");
         }

@@ -99,14 +99,27 @@ public class VaultTest {
         try {
             JsonObject original = vault.getIndex();
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
-            vault.deleteFile("");       // Try deleting non-existent file
-            vault.deleteFile("testReaderWriter.json");
+            vault.delete(vault.getRoot().getEntries().get(0), vault.getRoot());
             vault.save();
             JsonObject updated = vault.getIndex();
 
             assertEquals(0, vault.getDataFolder().listFiles().length);
             assertEquals(JsonProvider.GSON.toJson(original), JsonProvider.GSON.toJson(updated));
         } catch (IOException | CryptoException e) {
+            fail(e);
+        }
+    }
+
+    @Test
+    public void testDeleteDir() {
+        try {
+            vault.createDir("test", vault.getRoot());
+            File dirOnDisk = new File(vault.getDataFolder(), vault.getRoot().getEntries().get(0).getId());
+            vault.delete(vault.getRoot().getEntries().get(0), vault.getRoot());
+
+            assertEquals(vault.getRoot().getEntries().size(), 0);
+            assertFalse(dirOnDisk.exists());
+        } catch (IOException e) {
             fail(e);
         }
     }

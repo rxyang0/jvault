@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import exceptions.CryptoException;
 import io.Reader;
 import io.Writer;
+import org.apache.commons.io.FileUtils;
 import util.CryptoProvider;
 
 import java.io.*;
@@ -33,7 +34,7 @@ public class Vault {
             unlock(password);
             root.addEntries(index.getAsJsonObject("filesystem").getAsJsonArray("entries"));
         } else {
-            dataFolder.mkdirs();
+            boolean result = dataFolder.mkdirs();
             unlock(password);
             save();
         }
@@ -75,16 +76,14 @@ public class Vault {
     }
 
     // MODIFIES: this
-    // EFFECTS: finds and deletes file from vault root and disk
-    public void deleteFile(String fileName) throws IOException {
-        for (VaultEntry entry : root.getEntries()) {
-            if (entry.getName().equals(fileName)) {
-                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId(), false));
-                encrypted.delete();
-                root.deleteEntry(entry);
-                break;
-            }
+    // EFFECTS: deletes file or folder from dir and disk
+    public void delete(VaultEntry entry, VaultDirectory dir) throws IOException {
+        if (entry.getClass().equals(VaultFile.class)) {
+            boolean result = new File(dataFolder, root.getPathOfEntry(entry.getId(), false)).delete();
+        } else {
+            FileUtils.deleteDirectory(new File(dataFolder, root.getPathOfEntry(entry.getId(), false)));
         }
+        dir.deleteEntry(entry);
 
         save();
     }
@@ -106,7 +105,7 @@ public class Vault {
     public void createDir(String name, VaultDirectory parent) throws IOException {
         String id = UUID.randomUUID().toString();
         String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(parent.getId(), false);
-        new File(pathFromRoot, id).mkdir();
+        boolean result = new File(pathFromRoot, id).mkdir();
         parent.addEntry(new VaultDirectory(id, name));
         save();
     }
