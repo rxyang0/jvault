@@ -6,15 +6,20 @@ import filesystem.VaultDirectory;
 import filesystem.VaultEntry;
 import filesystem.VaultFile;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -62,9 +67,12 @@ public class VaultExplorer extends BorderPane {
         list.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
                 for (VaultEntry vaultEntry : currentDir.getEntries()) {
-                    if (vaultEntry.getName().equals(list.getSelectionModel().selectedItemProperty().get())
-                            && vaultEntry.getClass().equals(VaultDirectory.class)) {
-                        updateList((VaultDirectory) vaultEntry);
+                    if (vaultEntry.getName().equals(list.getSelectionModel().selectedItemProperty().get())) {
+                        if (vaultEntry.getClass().equals(VaultDirectory.class)) {
+                            updateList((VaultDirectory) vaultEntry);
+                        } else {
+                            openFile((VaultFile) vaultEntry);
+                        }
                         break;
                     }
                 }
@@ -186,6 +194,35 @@ public class VaultExplorer extends BorderPane {
             }
         } else {
             FxApp.getWindow().statusBar.showError("No entry selected");
+        }
+    }
+
+    // MODIFIES: FxApp.getWindow()
+    // EFFECTS: if file is an image, display it in a pop-up window
+    private void openFile(VaultFile file) {
+        String extension = file.getName().substring(file.getName().lastIndexOf('.'));
+        if (extension.matches("(.jpg)|(.png)")) {
+            FxApp.getWindow().statusBar.showStatus("Opening \"" + file.getName() + "\"");
+            try {
+                Stage imageStage = new Stage();
+                imageStage.setTitle(file.getName());
+
+                Image image = new Image(new ByteArrayInputStream(vault.save(file)));
+                ImageView imageView = new ImageView(image);
+                imageView.setPreserveRatio(true);
+                imageView.fitWidthProperty().bind(imageStage.widthProperty());
+                imageView.fitHeightProperty().bind(imageStage.heightProperty());
+
+                imageStage.setScene(new Scene(new BorderPane(imageView), 400, 400));
+                imageStage.show();
+            } catch (IOException e) {
+                FxApp.getWindow().statusBar.showError("IO error when opening file: " + e.getMessage());
+            } catch (CryptoException e) {
+                FxApp.getWindow().statusBar.showError("Crypto error when opening file (incorrect password?): "
+                        + e.getMessage());
+            }
+        } else {
+            FxApp.getWindow().statusBar.showError("Cannot open unsupported file \"" + file.getName() + "\"");
         }
     }
 
