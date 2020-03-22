@@ -1,5 +1,7 @@
 package ui;
 
+import exceptions.CryptoException;
+import filesystem.Vault;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -9,9 +11,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import java.io.File;
+import java.io.IOException;
+
 // Displays navigation controls, address bar, and vault file explorer
 public class VaultExplorer extends BorderPane {
 
+    private Vault vault;
     private TextField address;
     private ListView<String> list;
 
@@ -54,6 +60,18 @@ public class VaultExplorer extends BorderPane {
             // Select item
         });
         this.setCenter(list);
+    }
+
+    // MODIFIES: this, FxApp.getWindow()
+    public void loadVault(String name, String password, File directory) {
+        try {
+            vault = new Vault(new File(directory, name), password.toCharArray());
+            FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + name + "\"");
+        } catch (IOException e) {
+            FxApp.getWindow().statusBar.showError("IO error when loading vault: " + e.getMessage());
+        } catch (CryptoException e) {
+            FxApp.getWindow().statusBar.showError("Crypto error when loading vault: " + e.getMessage());
+        }
     }
 
 }
