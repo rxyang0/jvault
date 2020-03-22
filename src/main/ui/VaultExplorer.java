@@ -18,6 +18,7 @@ import java.io.IOException;
 public class VaultExplorer extends BorderPane {
 
     private Vault vault;
+    private Button back;
     private TextField address;
     private ListView<String> list;
 
@@ -33,7 +34,7 @@ public class VaultExplorer extends BorderPane {
         HBox addressBar = new HBox();
         addressBar.setPadding(new Insets(2, 15, 0, 10));
 
-        Button back = new Button("←");
+        back = new Button("←");
         back.setDisable(true);
         addressBar.getChildren().add(back);
 
@@ -63,15 +64,25 @@ public class VaultExplorer extends BorderPane {
     }
 
     // MODIFIES: this, FxApp.getWindow()
-    public void loadVault(String name, String password, File directory) {
+    // EFFECTS: creates or loads vault, then populates list of files
+    protected void loadVault(String name, File directory, String password) {
         try {
-            vault = new Vault(new File(directory, name), password.toCharArray());
-            FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + name + "\"");
+            if (name == null) {     // Load vault
+                vault = new Vault(directory, password.toCharArray());
+            } else {                // Create vault
+                vault = new Vault(new File(directory, name), password.toCharArray());
+            }
         } catch (IOException e) {
             FxApp.getWindow().statusBar.showError("IO error when loading vault: " + e.getMessage());
+            return;
         } catch (CryptoException e) {
             FxApp.getWindow().statusBar.showError("Crypto error when loading vault: " + e.getMessage());
+            return;
         }
+        FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + vault.getVaultFolder().getName() + "\"");
+        FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
+        back.setDisable(false);
+        address.setDisable(false);
     }
 
 }
