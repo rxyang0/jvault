@@ -121,7 +121,7 @@ public class VaultExplorer extends BorderPane {
             vault.addFile(file, currentDir);
             updateList(currentDir);
             FxApp.getWindow().statusBar.showStatus("Added file \"" + file.getName() + "\" under \"/"
-                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true));
+                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
         } catch (IOException e) {
             FxApp.getWindow().statusBar.showError("IO error when adding file: " + e.getMessage());
         } catch (CryptoException e) {
@@ -145,7 +145,7 @@ public class VaultExplorer extends BorderPane {
             try {
                 vault.saveFile(vaultFile.get().getName(), destination);
                 FxApp.getWindow().statusBar.showStatus("Saved file \"" + vaultFile.get().getName() + "\" under \""
-                        + destination.getAbsolutePath());
+                        + destination.getAbsolutePath() + "\"");
             } catch (IOException e) {
                 FxApp.getWindow().statusBar.showError("IO error when saving file: " + e.getMessage());
             } catch (CryptoException e) {
@@ -164,7 +164,7 @@ public class VaultExplorer extends BorderPane {
             vault.createDir(name, currentDir);
             updateList(currentDir);
             FxApp.getWindow().statusBar.showStatus("Created new folder \"" + name + "\" under \"/"
-                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true));
+                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
         } catch (IOException e) {
             FxApp.getWindow().statusBar.showError("IO error when creating folder: " + e.getMessage());
         }
