@@ -170,7 +170,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
     }
 
     // EFFECTS: enables or disables all menu items relevant to a loaded vault
-    protected void setStateVaultMenuItems(boolean state) {
+    protected void enableVaultMenuBarItems(boolean state) {
         closeVault.setDisable(!state);
         editMenu.getItems().forEach(x -> x.setDisable(!state));
     }
