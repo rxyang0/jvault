@@ -4,6 +4,7 @@ import exceptions.CryptoException;
 import filesystem.Vault;
 import filesystem.VaultDirectory;
 import filesystem.VaultEntry;
+import filesystem.VaultFile;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -12,9 +13,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.stage.DirectoryChooser;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 // Displays navigation controls, address bar, and vault file explorer
@@ -109,6 +112,33 @@ public class VaultExplorer extends BorderPane {
         } catch (CryptoException e) {
             FxApp.getWindow().statusBar.showError("Crypto error when adding file (maybe incorrect password?): "
                     + e.getMessage());
+        }
+    }
+
+    // MODIFIES: FxApp.getWindow()
+    // EFFECTS: prompts user to select destination directory and saves file
+    protected void saveFile() {
+        Optional<VaultEntry> vaultFile = currentDir.getEntries().stream()
+                .filter(x -> x.getName().equals(list.getSelectionModel().selectedItemProperty().get())).findFirst();
+        if (vaultFile.isPresent() && vaultFile.get().getClass().equals(VaultFile.class)) {
+            DirectoryChooser chooser = new DirectoryChooser();
+            chooser.setTitle("Select Destination Folder");
+            File destination = chooser.showDialog(null);
+            if (destination == null) {
+                return;
+            }
+            try {
+                vault.saveFile(vaultFile.get().getName(), destination);
+                FxApp.getWindow().statusBar.showStatus("Saved file \"" + vaultFile.get().getName() + "\" under \""
+                        + destination.getAbsolutePath());
+            } catch (IOException e) {
+                FxApp.getWindow().statusBar.showError("IO error when saving file: " + e.getMessage());
+            } catch (CryptoException e) {
+                FxApp.getWindow().statusBar.showError("Crypto error when saving file (incorrect password?): "
+                        + e.getMessage());
+            }
+        } else {
+            FxApp.getWindow().statusBar.showError("No file selected");
         }
     }
 

@@ -58,6 +58,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         createFolder.setOnAction(e -> handleCreateDir());
 
         MenuItem save = new MenuItem("Save File");
+        save.setOnAction(e -> FxApp.getWindow().explorer.saveFile());
 
         MenuItem rename = new MenuItem("Rename");
 
@@ -65,8 +66,8 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
         MenuItem selectAll = new MenuItem("Select All");
 
-        editMenu.getItems().addAll(add, createFolder, new SeparatorMenuItem(), save, rename, delete,
-                new SeparatorMenuItem(), selectAll);
+        editMenu.getItems().addAll(add, createFolder, new SeparatorMenuItem(), save, new SeparatorMenuItem(),
+                rename, delete, new SeparatorMenuItem(), selectAll);
         editMenu.getItems().forEach(x -> x.setDisable(true));
         this.getMenus().add(editMenu);
     }
