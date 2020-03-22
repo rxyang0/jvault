@@ -58,11 +58,14 @@ public class VaultExplorer extends BorderPane {
         list = new ListView<>();
         list.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
-                // Double click
+                for (VaultEntry vaultEntry : currentDir.getEntries()) {
+                    if (vaultEntry.getName().equals(list.getSelectionModel().selectedItemProperty().getName())
+                            && vaultEntry.getClass().equals(VaultDirectory.class)) {
+                        updateList((VaultDirectory) vaultEntry);
+                        break;
+                    }
+                }
             }
-        });
-        list.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            // Select item
         });
         this.setCenter(list);
     }
@@ -96,6 +99,7 @@ public class VaultExplorer extends BorderPane {
     // EFFECTS: sets current path and repopulates list of files
     private void updateList(VaultDirectory dir) {
         currentDir = dir;
+        address.setText("/" + vault.getRoot().getPathOfEntry(currentDir.getId()));
         list.getItems().clear();
         list.getItems().addAll(
                 dir.getEntries().stream().map(VaultEntry::getName).collect(Collectors.toList()));
