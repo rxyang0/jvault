@@ -167,6 +167,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
             passwordField.textProperty().addListener((observable, oldValue, newValue)
                     -> dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(newValue.equals("")));
             textFieldParent.getChildren().add(passwordField);
+            passwordField.requestFocus();
         } else {
             dialog.getEditor().textProperty().addListener((observable, oldValue, newValue)
                     -> dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(newValue.equals("")));
