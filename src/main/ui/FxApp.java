@@ -40,7 +40,7 @@ public class FxApp extends Application {
         }
     }
 
-    protected static FxApp getInstance() {
+    protected static FxApp getApp() {
         return app;
     }
 
