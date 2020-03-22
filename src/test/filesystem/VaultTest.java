@@ -84,7 +84,7 @@ public class VaultTest {
         try {
             JsonObject original = vault.getIndex();
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
-            vault.save();
+            vault.sync();
             JsonObject updated = vault.getIndex();
 
             assertEquals(1, vault.getDataFolder().listFiles().length);
@@ -100,7 +100,7 @@ public class VaultTest {
             JsonObject original = vault.getIndex();
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
             vault.delete(vault.getRoot().getEntries().get(0), vault.getRoot());
-            vault.save();
+            vault.sync();
             JsonObject updated = vault.getIndex();
 
             assertEquals(0, vault.getDataFolder().listFiles().length);
@@ -145,6 +145,26 @@ public class VaultTest {
             assertTrue(new File(vault.getDataFolder(), "testReaderWriter.json").exists());
 
             vault.saveFile("", vault.getDataFolder());       // Try saving non-existent file
+        } catch (IOException | CryptoException e) {
+            fail(e);
+        }
+    }
+
+    @Test
+    public void testSaveFileToBytes() {
+        try {
+            vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());
+            assertTrue(vault.save(vault.getRoot().getEntries().get(0)).length > 0);
+        } catch (IOException | CryptoException e) {
+            fail(e);
+        }
+    }
+
+    @Test
+    public void testSaveDir() {
+        try {
+            vault.createDir("test", vault.getRoot());
+            assertTrue(vault.save(vault.getRoot().getEntries().get(0)).length == 0);
         } catch (IOException | CryptoException e) {
             fail(e);
         }

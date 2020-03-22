@@ -36,7 +36,7 @@ public class Vault {
         } else {
             boolean result = dataFolder.mkdirs();
             unlock(password);
-            save();
+            sync();
         }
     }
 
@@ -54,7 +54,7 @@ public class Vault {
     // MODIFIES: this
     // EFFECTS: destroys CryptoProvider and saves filesystem
     public void lock() throws IOException {
-        save();
+        sync();
         crypto.destroy();
     }
 
@@ -72,7 +72,7 @@ public class Vault {
         VaultFile file = new VaultFile(id, fileName, (int) inputFile.length());
         dir.addEntry(file);
 
-        save();
+        sync();
     }
 
     // MODIFIES: this
@@ -85,7 +85,7 @@ public class Vault {
         }
         dir.deleteEntry(entry);
 
-        save();
+        sync();
     }
 
     // EFFECTS: decrypts and saves contents of file in vault root to local folder
@@ -100,6 +100,16 @@ public class Vault {
         }
     }
 
+    // EFFECTS: decrypts and returns contents of file
+    public byte[] save(VaultEntry entry) throws IOException, CryptoException {
+        if (entry.getClass().equals(VaultFile.class)) {
+            File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId(), false));
+            return crypto.decrypt(new Reader(encrypted).readBytes());
+        } else {
+            return new byte[0];
+        }
+    }
+
     // MODIFIES: this
     // EFFECTS: creates new directory under existing VaultDirectory
     public void createDir(String name, VaultDirectory parent) throws IOException {
@@ -107,11 +117,11 @@ public class Vault {
         String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(parent.getId(), false);
         boolean result = new File(pathFromRoot, id).mkdir();
         parent.addEntry(new VaultDirectory(id, name));
-        save();
+        sync();
     }
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder
-    public void save() throws IOException {
+    public void sync() throws IOException {
         index = new JsonObject();
         index.add("crypto", crypto.toJson());
         index.add("filesystem", root.toJson());
