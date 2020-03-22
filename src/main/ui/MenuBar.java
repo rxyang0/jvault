@@ -1,5 +1,6 @@
 package ui;
 
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
@@ -42,6 +43,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         closeVault.setOnAction(e -> FxApp.getWindow().explorer.closeVault());
 
         MenuItem exit = new MenuItem("Exit");
+        exit.setOnAction(e -> Platform.exit());
 
         fileMenu.getItems().addAll(createVault, openVault, new SeparatorMenuItem(), closeVault,
                 new SeparatorMenuItem(), exit);
