@@ -95,6 +95,7 @@ public class VaultExplorer extends BorderPane {
         updateList(vault.getRoot());
         enableVaultExplorerUI(true);
         FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
+        FxApp.getInstance().setTitle(vault.getVaultFolder().getName());
         FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + vault.getVaultFolder().getName() + "\"");
     }
 
@@ -106,6 +107,7 @@ public class VaultExplorer extends BorderPane {
             vault = null;
             enableVaultExplorerUI(false);
             FxApp.getWindow().menuBar.setStateVaultMenuItems(false);
+            FxApp.getInstance().setTitle(null);
             FxApp.getWindow().statusBar.showStatus("");
         } catch (IOException e) {
             FxApp.getWindow().statusBar.showError("IO error when saving vault: " + e.getMessage());
