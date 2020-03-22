@@ -38,6 +38,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         closeVault = new MenuItem("Close Vault");
         closeVault.setAccelerator(KeyCombination.keyCombination("SHORTCUT+L"));
         closeVault.setDisable(true);
+        closeVault.setOnAction(e -> FxApp.getWindow().explorer.closeVault());
 
         MenuItem exit = new MenuItem("Exit");
 

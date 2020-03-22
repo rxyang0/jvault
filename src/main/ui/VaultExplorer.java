@@ -93,10 +93,23 @@ public class VaultExplorer extends BorderPane {
             return;
         }
         updateList(vault.getRoot());
-        back.setDisable(false);
-        address.setDisable(false);
+        enableVaultExplorerUI(true);
         FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
         FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + vault.getVaultFolder().getName() + "\"");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: closes vault and clears status bar
+    protected void closeVault() {
+        try {
+            vault.lock();
+            vault = null;
+            enableVaultExplorerUI(false);
+            FxApp.getWindow().menuBar.setStateVaultMenuItems(false);
+            FxApp.getWindow().statusBar.showStatus("");
+        } catch (IOException e) {
+            FxApp.getWindow().statusBar.showError("IO error when saving vault: " + e.getMessage());
+        }
     }
 
     // MODIFIES: this, FxApp.getWindow()
@@ -163,6 +176,17 @@ public class VaultExplorer extends BorderPane {
         list.getItems().clear();
         list.getItems().addAll(
                 dir.getEntries().stream().map(VaultEntry::getName).collect(Collectors.toList()));
+    }
+
+    // MODIFIES: this
+    // EFFECTS: enables or disables all VaultExplorer elements relevant to a loaded vault
+    private void enableVaultExplorerUI(boolean state) {
+        back.setDisable(!state);
+        address.setDisable(!state);
+        if (!state) {
+            address.setText("");
+            list.getItems().clear();
+        }
     }
 
 }
