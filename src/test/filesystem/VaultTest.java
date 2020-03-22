@@ -112,6 +112,18 @@ public class VaultTest {
     }
 
     @Test
+    public void testCreateDir() {
+        try {
+            vault.createDir("test", vault.getRoot());
+
+            assertEquals(vault.getRoot().getEntries().size(), 1);
+            assertTrue(new File(vault.getDataFolder(), vault.getRoot().getEntries().get(0).getId()).exists());
+        } catch (IOException e) {
+            fail(e);
+        }
+    }
+
+    @Test
     public void testSaveFile() {
         try {
             vault.addFile(new File("data/testReaderWriter.json"), vault.getRoot());

@@ -118,15 +118,15 @@ public class VaultDirectoryTest {
 
         directory.addEntry(subDir);
 
-        assertEquals("", directory.getPathOfEntry(DIR_ID));
-        assertEquals(TEST_ID_1, directory.getPathOfEntry(TEST_ID_1));
-        assertEquals(TEST_ID_2, directory.getPathOfEntry(TEST_ID_2));
-        assertEquals(TEST_ID_2 + "/" + TEST_ID_3, directory.getPathOfEntry(TEST_ID_3));
+        assertEquals("", directory.getPathOfEntry(DIR_ID, false));
+        assertEquals(TEST_ID_1, directory.getPathOfEntry(TEST_ID_1, false));
+        assertEquals(TEST_ID_2, directory.getPathOfEntry(TEST_ID_2, false));
+        assertEquals(TEST_ID_2 + "/" + TEST_ID_3, directory.getPathOfEntry(TEST_ID_3, false));
     }
 
     @Test
     public void testGetPathOfEntryNotFound() {
-        assertNull(directory.getPathOfEntry("123"));
+        assertNull(directory.getPathOfEntry("123", false));
     }
 
     @Test

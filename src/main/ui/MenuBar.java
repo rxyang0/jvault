@@ -12,7 +12,6 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
     private Menu fileMenu;
     private Menu editMenu;
-    private MenuItem lockVault;
     private MenuItem closeVault;
 
     // EFFECTS: constructs menu bar
@@ -35,16 +34,13 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         openVault.setAccelerator(KeyCombination.keyCombination("SHORTCUT+O"));
         openVault.setOnAction(e -> handleOpenVault());
 
-        lockVault = new MenuItem("Lock");
-        lockVault.setAccelerator(KeyCombination.keyCombination("SHORTCUT+L"));
-        lockVault.setDisable(true);
-
         closeVault = new MenuItem("Close Vault");
+        closeVault.setAccelerator(KeyCombination.keyCombination("SHORTCUT+L"));
         closeVault.setDisable(true);
 
         MenuItem exit = new MenuItem("Exit");
 
-        fileMenu.getItems().addAll(createVault, openVault, closeVault, new SeparatorMenuItem(), lockVault,
+        fileMenu.getItems().addAll(createVault, openVault, new SeparatorMenuItem(), closeVault,
                 new SeparatorMenuItem(), exit);
         this.getMenus().add(fileMenu);
     }
@@ -56,6 +52,9 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
         MenuItem add = new MenuItem("Add File");
 
+        MenuItem createFolder = new MenuItem("Create Folder");
+        createFolder.setOnAction(e -> handleCreateDir());
+
         MenuItem save = new MenuItem("Save File");
 
         MenuItem rename = new MenuItem("Rename");
@@ -64,7 +63,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
         MenuItem selectAll = new MenuItem("Select All");
 
-        editMenu.getItems().addAll(add, save, new SeparatorMenuItem(), rename, delete,
+        editMenu.getItems().addAll(add, createFolder, new SeparatorMenuItem(), save, rename, delete,
                 new SeparatorMenuItem(), selectAll);
         editMenu.getItems().forEach(x -> x.setDisable(true));
         this.getMenus().add(editMenu);
@@ -133,6 +132,16 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         FxApp.getWindow().explorer.loadVault(null, destination, pass.get());
     }
 
+    // MODIFIES: FxApp.getWindow()
+    // EFFECTS: prompts user for new directory name and gets VaultExplorer to create it
+    private void handleCreateDir() {
+        Optional<String> name = prompt("Folder Name");
+        if (!name.isPresent()) {
+            return;
+        }
+        FxApp.getWindow().explorer.createDir(name.get());
+    }
+
     // EFFECTS: prompts user and returns text input
     private Optional<String> prompt(String title) {
         TextInputDialog dialog = new TextInputDialog();
@@ -146,9 +155,8 @@ public class MenuBar extends javafx.scene.control.MenuBar {
 
     // EFFECTS: enables or disables all menu items relevant to a loaded vault
     protected void setStateVaultMenuItems(boolean state) {
-        lockVault.setDisable(state);
-        closeVault.setDisable(state);
-        editMenu.getItems().forEach(x -> x.setDisable(state));
+        closeVault.setDisable(!state);
+        editMenu.getItems().forEach(x -> x.setDisable(!state));
     }
 
 }

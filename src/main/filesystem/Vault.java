@@ -65,7 +65,7 @@ public class Vault {
         byte[] encrypted = crypto.encrypt(new Reader(inputFile).readBytes());
         String id = UUID.randomUUID().toString();
 
-        String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(dir.getId());
+        String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(dir.getId(), false);
         new Writer(new File(pathFromRoot, id)).writeBytes(encrypted);
 
         VaultFile file = new VaultFile(id, fileName, (int) inputFile.length());
@@ -79,7 +79,7 @@ public class Vault {
     public void deleteFile(String fileName) throws IOException {
         for (VaultEntry entry : root.getEntries()) {
             if (entry.getName().equals(fileName)) {
-                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
+                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId(), false));
                 encrypted.delete();
                 root.deleteEntry(entry);
                 break;
@@ -93,12 +93,22 @@ public class Vault {
     public void saveFile(String fileName, File outputDir) throws IOException, CryptoException {
         for (VaultEntry entry : root.getEntries()) {
             if (entry.getName().equals(fileName)) {
-                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId()));
+                File encrypted = new File(dataFolder, root.getPathOfEntry(entry.getId(), false));
                 byte[] decrypted = crypto.decrypt(new Reader(encrypted).readBytes());
                 new Writer(new File(outputDir, fileName)).writeBytes(decrypted);
                 break;
             }
         }
+    }
+
+    // MODIFIES: this
+    // EFFECTS: creates new directory under existing VaultDirectory
+    public void createDir(String name, VaultDirectory parent) throws IOException {
+        String id = UUID.randomUUID().toString();
+        String pathFromRoot = dataFolder.getPath() + "/" + root.getPathOfEntry(parent.getId(), false);
+        new File(pathFromRoot, id).mkdir();
+        parent.addEntry(new VaultDirectory(id, name));
+        save();
     }
 
     // EFFECTS: saves filesystem data of this vault to filesystem.json in root folder

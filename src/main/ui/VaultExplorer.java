@@ -59,7 +59,7 @@ public class VaultExplorer extends BorderPane {
         list.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
                 for (VaultEntry vaultEntry : currentDir.getEntries()) {
-                    if (vaultEntry.getName().equals(list.getSelectionModel().selectedItemProperty().getName())
+                    if (vaultEntry.getName().equals(list.getSelectionModel().selectedItemProperty().get())
                             && vaultEntry.getClass().equals(VaultDirectory.class)) {
                         updateList((VaultDirectory) vaultEntry);
                         break;
@@ -88,18 +88,31 @@ public class VaultExplorer extends BorderPane {
             FxApp.getWindow().statusBar.showError("Crypto error when loading vault: " + e.getMessage());
             return;
         }
-        FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + vault.getVaultFolder().getName() + "\"");
-        FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
+        updateList(vault.getRoot());
         back.setDisable(false);
         address.setDisable(false);
-        updateList(vault.getRoot());
+        FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
+        FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + vault.getVaultFolder().getName() + "\"");
+    }
+
+    // MODIFIES: this, FxApp.getWindow()
+    // EFFECTS: creates new VaultDirectory under currentDir with name and updates list
+    protected void createDir(String name) {
+        try {
+            vault.createDir(name, currentDir);
+            updateList(currentDir);
+            FxApp.getWindow().statusBar.showStatus("Created new folder \"" + name + "\" under \"/"
+                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true));
+        } catch (IOException e) {
+            FxApp.getWindow().statusBar.showError("IO error when creating folder: " + e.getMessage());
+        }
     }
 
     // MODIFIES: this
     // EFFECTS: sets current path and repopulates list of files
     private void updateList(VaultDirectory dir) {
         currentDir = dir;
-        address.setText("/" + vault.getRoot().getPathOfEntry(currentDir.getId()));
+        address.setText("/" + vault.getRoot().getPathOfEntry(currentDir.getId(), true));
         list.getItems().clear();
         list.getItems().addAll(
                 dir.getEntries().stream().map(VaultEntry::getName).collect(Collectors.toList()));
