@@ -2,6 +2,7 @@ package ui;
 
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.Pane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -61,14 +62,9 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         MenuItem save = new MenuItem("Save File");
         save.setOnAction(e -> FxApp.getWindow().explorer.saveFile());
 
-        MenuItem rename = new MenuItem("Rename");
-
         MenuItem delete = new MenuItem("Delete");
 
-        MenuItem selectAll = new MenuItem("Select All");
-
-        editMenu.getItems().addAll(add, createFolder, new SeparatorMenuItem(), save, new SeparatorMenuItem(),
-                rename, delete, new SeparatorMenuItem(), selectAll);
+        editMenu.getItems().addAll(add, createFolder, new SeparatorMenuItem(), save, new SeparatorMenuItem(), delete);
         editMenu.getItems().forEach(x -> x.setDisable(true));
         this.getMenus().add(editMenu);
     }
@@ -89,11 +85,11 @@ public class MenuBar extends javafx.scene.control.MenuBar {
     // MODIFIES: FxApp.getWindow()
     // EFFECTS: prompts user for name, password, and destination directory
     private void handleCreateVault() {
-        Optional<String> name = prompt("Set Name of New Vault");
+        Optional<String> name = prompt("Set Name of New Vault", false);
         if (!name.isPresent()) {
             return;
         }
-        Optional<String> pass = prompt("Set Password of \"" + name.get() + "\"");
+        Optional<String> pass = prompt("Set Password of \"" + name.get() + "\"", true);
         if (!pass.isPresent()) {
             return;
         }
@@ -129,7 +125,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
             alert.show();
             return;
         }
-        Optional<String> pass = prompt("Password to \"" + destination.getName() + "\"");
+        Optional<String> pass = prompt("Password to \"" + destination.getName() + "\"", true);
         if (!pass.isPresent()) {
             return;
         }
@@ -151,7 +147,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
     // MODIFIES: FxApp.getWindow()
     // EFFECTS: prompts user for new directory name and gets VaultExplorer to create it
     private void handleCreateDir() {
-        Optional<String> name = prompt("Folder Name");
+        Optional<String> name = prompt("Folder Name", false);
         if (!name.isPresent()) {
             return;
         }
@@ -159,13 +155,22 @@ public class MenuBar extends javafx.scene.control.MenuBar {
     }
 
     // EFFECTS: prompts user and returns text input
-    private Optional<String> prompt(String title) {
+    private Optional<String> prompt(String title, boolean mask) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle(title);
         dialog.setHeaderText("");
+        if (mask) {
+            Pane textFieldParent = (Pane) dialog.getDialogPane().lookup("TextField").getParent();
+            textFieldParent.getChildren().remove(dialog.getDialogPane().lookup("TextField"));
+            PasswordField passwordField = new PasswordField();
+            passwordField.textProperty().addListener((observable, oldValue, newValue)
+                    -> dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(newValue.equals("")));
+            textFieldParent.getChildren().add(passwordField);
+        } else {
+            dialog.getEditor().textProperty().addListener((observable, oldValue, newValue)
+                    -> dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(newValue.equals("")));
+        }
         dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
-        dialog.getEditor().textProperty().addListener((observable, oldValue, newValue)
-                -> dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(newValue.equals("")));
         return dialog.showAndWait();
     }
 
