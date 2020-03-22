@@ -101,7 +101,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
             if (new File(destination, name.get()).exists()) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText("Directory already exists!");
-                alert.setContentText("A directory with the name \"" + name.get() + "\" already exists at \""
+                alert.setContentText("A directory with the name \"" + name.get() + "\" already exists in \""
                         + destination.getAbsolutePath() + "\"");
                 alert.show();
             } else {
@@ -117,6 +117,13 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         chooser.setTitle("Select Vault");
         File destination = chooser.showDialog(null);
         if (destination == null) {
+            return;
+        } else if (!new File(destination, destination.getName() + ".jvault").exists()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText("That Does Not Appear To Be a Vault!");
+            alert.setContentText("Missing \"" + destination.getName() + ".jvault" + "\" file in \""
+                    + destination.getAbsolutePath() + "\"");
+            alert.show();
             return;
         }
         Optional<String> pass = prompt("Password to \"" + destination.getName() + "\"");
