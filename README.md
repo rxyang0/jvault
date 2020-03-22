@@ -51,3 +51,38 @@ As a user, I want to be able to:
 - create folders within the vault to organize files
 - add and save entire folders to/from the vault
 - change the password to a single file or vault
+
+## Instructions for Grader
+
+### Prerequisites *before* running application
+
+- Locate or create a "secret" file on your local drive (it could just be a .txt file containing data you can recognize)
+- Identify a folder on your local drive where the application can create a vault in
+- Either clone and build the source code yourself, or [download and double-click the standalone runnable JAR file] (https://github.students.cs.ubc.ca/cpsc210-2019w-t2/project_d1z2b/releases)
+
+### Interacting with the GUI (continue sequentially)
+
+- #### Create a vault
+
+  - After a window with the title "JVault" has appeared, click the File menu and proceed to **create** a vault with your choice of name, password, and destination folder
+
+- #### Add X to Y / Save application state
+
+  - Click the Edit menu and proceed to **add** a file by selecting that secret file from before. Notice that the name of the file has now appeared in the list of files, and that the encrypted version of the file has now been stored in the "data" folder of the vault on your local drive
+  - Note that there is no dedicated button to save the state; all actions trigger automatic saves
+
+- #### Reload application state
+
+  - Exit the application, then relaunch the application. Click the File menu and proceed to **open** the same vault you have created on your local drive, by selecting the folder, clicking open, and entering the exact same password. Notice that the name of the secret file has reappeared in the list
+
+- #### Visual component
+
+  - Locate or create a **JPG** or **PNG** image on your local drive. Click the Edit menu and proceed to **add** that image file to the vault. Then, double-click the added file in the list of files. Notice that a window has appeared that displays that image
+
+- #### Save X from Y
+
+  - Click and select any added file in the list of files. Ensuring that it is highlighted in blue, click the Edit menu and proceed to **save** the file by choosing a folder on your local drive to save the file to. Notice that the decrypted version of the file has now been stored in the folder you have chosen
+
+- #### Delete X from Y
+
+  - Click and select any added file in the list of files. Ensuring that it is highlighted in blue, click the Edit menu and proceed to **delete** the file. Notice that the file has been removed from the list of files as well as from the "data" folder of the vault on your local drive
