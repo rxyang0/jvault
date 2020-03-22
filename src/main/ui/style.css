@@ -28,7 +28,7 @@
 }
 
 .list-view .list-cell:even {
-    -fx-background-color: lightgray;
+    -fx-background-color: gainsboro;
 }
 
 .list-view .list-cell:odd {
