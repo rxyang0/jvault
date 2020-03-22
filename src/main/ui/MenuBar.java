@@ -63,6 +63,7 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         save.setOnAction(e -> FxApp.getWindow().explorer.saveFile());
 
         MenuItem delete = new MenuItem("Delete");
+        delete.setOnAction(e -> FxApp.getWindow().explorer.delete());
 
         editMenu.getItems().addAll(add, createFolder, new SeparatorMenuItem(), save, new SeparatorMenuItem(), delete);
         editMenu.getItems().forEach(x -> x.setDisable(true));

@@ -130,8 +130,21 @@ public class VaultExplorer extends BorderPane {
         }
     }
 
+    // MODIFIES: this, FxApp.getWindow()
+    // EFFECTS: creates new VaultDirectory under currentDir with name and updates list
+    protected void createDir(String name) {
+        try {
+            vault.createDir(name, currentDir);
+            updateList(currentDir);
+            FxApp.getWindow().statusBar.showStatus("Created new folder \"" + name + "\" under \"/"
+                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
+        } catch (IOException e) {
+            FxApp.getWindow().statusBar.showError("IO error when creating folder: " + e.getMessage());
+        }
+    }
+
     // MODIFIES: FxApp.getWindow()
-    // EFFECTS: prompts user to select destination directory and saves file
+    // EFFECTS: prompts user to select destination directory and saves selected file
     protected void saveFile() {
         Optional<VaultEntry> vaultFile = currentDir.getEntries().stream()
                 .filter(x -> x.getName().equals(list.getSelectionModel().selectedItemProperty().get())).findFirst();
@@ -158,15 +171,21 @@ public class VaultExplorer extends BorderPane {
     }
 
     // MODIFIES: this, FxApp.getWindow()
-    // EFFECTS: creates new VaultDirectory under currentDir with name and updates list
-    protected void createDir(String name) {
-        try {
-            vault.createDir(name, currentDir);
-            updateList(currentDir);
-            FxApp.getWindow().statusBar.showStatus("Created new folder \"" + name + "\" under \"/"
-                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
-        } catch (IOException e) {
-            FxApp.getWindow().statusBar.showError("IO error when creating folder: " + e.getMessage());
+    // EFFECTS: deletes selected entry from vault and updates list
+    protected void delete() {
+        Optional<VaultEntry> vaultFile = currentDir.getEntries().stream()
+                .filter(x -> x.getName().equals(list.getSelectionModel().selectedItemProperty().get())).findFirst();
+        if (vaultFile.isPresent()) {
+            try {
+                vault.delete(vaultFile.get(), currentDir);
+                updateList(currentDir);
+                FxApp.getWindow().statusBar.showStatus("Deleted entry \"" + vaultFile.get().getName() + "\" under \"/"
+                        + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
+            } catch (IOException e) {
+                FxApp.getWindow().statusBar.showError("IO error when deleting entry: " + e.getMessage());
+            }
+        } else {
+            FxApp.getWindow().statusBar.showError("No entry selected");
         }
     }
 
