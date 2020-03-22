@@ -3,6 +3,7 @@ package ui;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.util.Optional;
@@ -45,12 +46,13 @@ public class MenuBar extends javafx.scene.control.MenuBar {
         this.getMenus().add(fileMenu);
     }
 
-    // MODIFIES: this
+    // MODIFIES: this, FxApp.getWindow()
     // EFFECTS: creates edit menu and adds it to menu bar
     private void addEditMenu() {
         editMenu = new Menu("Edit");
 
         MenuItem add = new MenuItem("Add File");
+        add.setOnAction(e -> handleAddFile());
 
         MenuItem createFolder = new MenuItem("Create Folder");
         createFolder.setOnAction(e -> handleCreateDir());
@@ -130,6 +132,18 @@ public class MenuBar extends javafx.scene.control.MenuBar {
             return;
         }
         FxApp.getWindow().explorer.loadVault(null, destination, pass.get());
+    }
+
+    // MODIFIES: FxApp.getWindow()
+    // EFFECTS: prompts user to select file to add and delegates to VaultExplorer
+    private void handleAddFile() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select File to Add");
+        File file = chooser.showOpenDialog(null);
+        if (file == null) {
+            return;
+        }
+        FxApp.getWindow().explorer.addFile(file);
     }
 
     // MODIFIES: FxApp.getWindow()

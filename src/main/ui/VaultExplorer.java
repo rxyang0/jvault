@@ -85,7 +85,8 @@ public class VaultExplorer extends BorderPane {
             FxApp.getWindow().statusBar.showError("IO error when loading vault: " + e.getMessage());
             return;
         } catch (CryptoException e) {
-            FxApp.getWindow().statusBar.showError("Crypto error when loading vault: " + e.getMessage());
+            FxApp.getWindow().statusBar.showError("Crypto error when loading vault (maybe incorrect password?): "
+                    + e.getMessage());
             return;
         }
         updateList(vault.getRoot());
@@ -93,6 +94,22 @@ public class VaultExplorer extends BorderPane {
         address.setDisable(false);
         FxApp.getWindow().menuBar.setStateVaultMenuItems(true);
         FxApp.getWindow().statusBar.showStatus("Loaded vault \"" + vault.getVaultFolder().getName() + "\"");
+    }
+
+    // MODIFIES: this, FxApp.getWindow()
+    // EFFECTS: adds file to vault and updates list
+    protected void addFile(File file) {
+        try {
+            vault.addFile(file, currentDir);
+            updateList(currentDir);
+            FxApp.getWindow().statusBar.showStatus("Added file \"" + file.getName() + "\" under \"/"
+                    + vault.getRoot().getPathOfEntry(currentDir.getId(), true));
+        } catch (IOException e) {
+            FxApp.getWindow().statusBar.showError("IO error when adding file: " + e.getMessage());
+        } catch (CryptoException e) {
+            FxApp.getWindow().statusBar.showError("Crypto error when adding file (maybe incorrect password?): "
+                    + e.getMessage());
+        }
     }
 
     // MODIFIES: this, FxApp.getWindow()
