@@ -58,7 +58,7 @@ As a user, I want to be able to:
 
 - Locate or create a "secret" file on your local drive (it could just be a .txt file containing data you can recognize)
 - Identify a folder on your local drive where the application can create a vault in
-- Either clone and build the source code yourself, or [download and double-click the standalone runnable JAR file] (https://github.students.cs.ubc.ca/cpsc210-2019w-t2/project_d1z2b/releases)
+- Either clone and build the source code yourself, or [download and double-click the standalone runnable JAR file](https://github.students.cs.ubc.ca/cpsc210-2019w-t2/project_d1z2b/releases)
 
 ### Interacting with the GUI (continue sequentially)
 
@@ -86,3 +86,30 @@ As a user, I want to be able to:
 - #### Delete X from Y
 
   - Click and select any added file in the list of files. Ensuring that it is highlighted in blue, click the Edit menu and proceed to **delete** the file. Notice that the file has been removed from the list of files as well as from the "data" folder of the vault on your local drive
+
+## Phase 4 Documentation
+
+### Task 2, Option #1: Custom Type Hierarchy
+
+The type hierarchy below exemplifies the composite pattern:
+
+![Filesystem type hierarchy](JVault-UML-Filesystem-Hierarchy.png)
+
+- *VaultEntry* is the component class, *VaultFile* is a leaf class, and *VaultDirectory* is the composite class that
+  aggregates multiple *VaultEntry* objects in an *ArrayList*
+- This hierarchy reflects a filesystem architecture, where directories can contain files and subdirectories, but files
+  cannot contain any children
+- All classes that implement *Jsonable* or extend *VaultEntry* must override the *toJson(): JsonObject* method.
+  *VaultFile* and *VaultDirectory* provide separate implementations of *toJson(): JsonObject*
+
+### Task 2, Option #2: Robust CryptoProvider Class
+
+- I have designed a custom *CryptoException* class with the sole purpose of generalizing and aggregating exceptions
+  thrown by Java crypto operations, such as *InvalidKeyException*, *InvalidKeySpecException*, and *BadPaddingException*
+  to say the least
+- Instead, the meaning of the specific exceptions above can be extracted based on an operation's context. For example,
+  if a *CryptoException* is thrown during a decryption operation, an incorrect password was most likely used
+- Most notably, the ***encrypt(input: byte[]): byte[]*** and ***decrypt(input: byte[]): byte[]*** methods throw
+  *CryptoException*
+- In *CryptoProviderTest*, two methods named *testEncryptDecryptCorrectPassword()* and
+  *testEncryptDecryptIncorrectPassword()* test when *CryptoException* is not expected and expected, respectively
