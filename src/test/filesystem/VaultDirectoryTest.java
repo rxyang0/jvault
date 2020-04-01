@@ -1,11 +1,10 @@
 package filesystem;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.JsonProvider;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -143,9 +142,7 @@ public class VaultDirectoryTest {
 
         directory.addEntry(subDir);
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-
-        assertEquals(476, gson.toJson(directory.toJson()).length());
+        assertEquals(476, JsonProvider.getGson().toJson(directory.toJson()).length());
     }
 
 }

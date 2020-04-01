@@ -1,10 +1,8 @@
 package io;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.Reader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.JsonProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,9 +33,8 @@ public class ReaderTest {
 
     @Test
     public void testReadJson() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try {
-            assertEquals(CORRECT, gson.toJson(reader.readJson()));
+            assertEquals(CORRECT, JsonProvider.getGson().toJson(reader.readJson()));
         } catch (IOException e) {
             fail("Read error");
         }

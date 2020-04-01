@@ -113,3 +113,9 @@ The type hierarchy below exemplifies the composite pattern:
   *CryptoException*
 - In *CryptoProviderTest*, two methods named *testEncryptDecryptCorrectPassword()* and
   *testEncryptDecryptIncorrectPassword()* test when *CryptoException* is not expected and expected, respectively
+
+### Task 3: Improvements to Design
+
+Principle | Problem Description | Refactored Changes
+---|---|---
+Reduce coupling | There exists separate places where different *Gson* objects are built for converting *JsonObject*s to JSON strings. This is inconsistent as the way the Gson object is built will affect the resulting JSON strings, which could cause tests to fail or cause a discrepancy between the expected and actual behavior. | Not all classes make use of the *JsonProvider* class, which holds a static final *Gson* object that all classes can use. The *Reader*, *Writer*, and test classes now all use the same consistently-built *Gson* object.

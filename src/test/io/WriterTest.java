@@ -1,12 +1,9 @@
 package io;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import io.Reader;
-import io.Writer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.JsonProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,10 +39,9 @@ public class WriterTest {
     public void testWriteJson() {
         JsonObject correctJson = new JsonObject();
         correctJson.addProperty("testProperty", "testValue");
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         try {
             writer.writeJson(correctJson);
-            assertEquals(CORRECT, gson.toJson(reader.readJson()));
+            assertEquals(CORRECT, JsonProvider.getGson().toJson(reader.readJson()));
         } catch (IOException e) {
             fail("Write error");
         }

@@ -88,7 +88,7 @@ public class VaultTest {
             JsonObject updated = vault.getIndex();
 
             assertEquals(1, vault.getDataFolder().listFiles().length);
-            assertNotEquals(JsonProvider.GSON.toJson(original), JsonProvider.GSON.toJson(updated));
+            assertNotEquals(JsonProvider.getGson().toJson(original), JsonProvider.getGson().toJson(updated));
         } catch (IOException | CryptoException e) {
             fail(e);
         }
@@ -104,7 +104,7 @@ public class VaultTest {
             JsonObject updated = vault.getIndex();
 
             assertEquals(0, vault.getDataFolder().listFiles().length);
-            assertEquals(JsonProvider.GSON.toJson(original), JsonProvider.GSON.toJson(updated));
+            assertEquals(JsonProvider.getGson().toJson(original), JsonProvider.getGson().toJson(updated));
         } catch (IOException | CryptoException e) {
             fail(e);
         }

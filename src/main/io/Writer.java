@@ -1,8 +1,7 @@
 package io;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import util.JsonProvider;
 
 import java.io.*;
 
@@ -23,8 +22,7 @@ public class Writer {
 
     // EFFECTS: writes JSON data to file
     public void writeJson(JsonObject outObj) throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        writeBytes(gson.toJson(outObj).getBytes());
+        writeBytes(JsonProvider.getGson().toJson(outObj).getBytes());
     }
 
 }

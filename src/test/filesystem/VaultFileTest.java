@@ -1,9 +1,8 @@
 package filesystem;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.JsonProvider;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,8 +28,7 @@ public class VaultFileTest {
 
     @Test
     public void testToJson() {
-        Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-        assertEquals(88, gson.toJson(file.toJson()).length());
+        assertEquals(88, JsonProvider.getGson().toJson(file.toJson()).length());
     }
 
 }
