@@ -1,10 +1,11 @@
 package io;
 
 import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
 import util.JsonProvider;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Reader {
 
@@ -25,7 +26,7 @@ public class Reader {
 
     // EFFECTS: reads JSON data from file
     public JsonObject readJson() throws IOException {
-        return JsonProvider.getGson().fromJson(new JsonReader(new FileReader(file)), JsonObject.class);
+        return JsonProvider.parseJson(new String(Files.readAllBytes(Paths.get(file.getAbsolutePath()))));
     }
 
 }

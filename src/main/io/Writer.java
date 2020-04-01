@@ -21,8 +21,8 @@ public class Writer {
     }
 
     // EFFECTS: writes JSON data to file
-    public void writeJson(JsonObject outObj) throws IOException {
-        writeBytes(JsonProvider.getGson().toJson(outObj).getBytes());
+    public void writeJson(JsonObject obj) throws IOException {
+        writeBytes(JsonProvider.saveJson(obj).getBytes());
     }
 
 }
