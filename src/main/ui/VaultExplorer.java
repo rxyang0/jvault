@@ -93,11 +93,10 @@ public class VaultExplorer extends BorderPane {
                 vault = new Vault(new File(directory, name), password.toCharArray());
             }
         } catch (IOException e) {
-            FxApp.getWindow().statusBar.showError("IO error when loading vault: " + e.getMessage());
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "loading vault", e);
             return;
         } catch (CryptoException e) {
-            FxApp.getWindow().statusBar.showError("Crypto error when loading vault (maybe incorrect password?): "
-                    + e.getMessage());
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.CRYPTO, "loading vault", e);
             return;
         }
         updateList(vault.getRoot());
@@ -118,7 +117,7 @@ public class VaultExplorer extends BorderPane {
             FxApp.getApp().setTitle(null);
             FxApp.getWindow().statusBar.showStatus("");
         } catch (IOException e) {
-            FxApp.getWindow().statusBar.showError("IO error when saving vault: " + e.getMessage());
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "saving vault", e);
         }
     }
 
@@ -131,10 +130,9 @@ public class VaultExplorer extends BorderPane {
             FxApp.getWindow().statusBar.showStatus("Added file \"" + file.getName() + "\" under \"/"
                     + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
         } catch (IOException e) {
-            FxApp.getWindow().statusBar.showError("IO error when adding file: " + e.getMessage());
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "adding file", e);
         } catch (CryptoException e) {
-            FxApp.getWindow().statusBar.showError("Crypto error when adding file (maybe incorrect password?): "
-                    + e.getMessage());
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.CRYPTO, "adding file", e);
         }
     }
 
@@ -147,7 +145,7 @@ public class VaultExplorer extends BorderPane {
             FxApp.getWindow().statusBar.showStatus("Created new folder \"" + name + "\" under \"/"
                     + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
         } catch (IOException e) {
-            FxApp.getWindow().statusBar.showError("IO error when creating folder: " + e.getMessage());
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "creating folder", e);
         }
     }
 
@@ -168,10 +166,9 @@ public class VaultExplorer extends BorderPane {
                 FxApp.getWindow().statusBar.showStatus("Saved file \"" + vaultFile.get().getName() + "\" under \""
                         + destination.getAbsolutePath() + "\"");
             } catch (IOException e) {
-                FxApp.getWindow().statusBar.showError("IO error when saving file: " + e.getMessage());
+                FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "saving file", e);
             } catch (CryptoException e) {
-                FxApp.getWindow().statusBar.showError("Crypto error when saving file (incorrect password?): "
-                        + e.getMessage());
+                FxApp.getWindow().statusBar.showError(StatusBar.Error.CRYPTO, "saving file", e);
             }
         } else {
             FxApp.getWindow().statusBar.showError("No file selected");
@@ -190,7 +187,7 @@ public class VaultExplorer extends BorderPane {
                 FxApp.getWindow().statusBar.showStatus("Deleted entry \"" + vaultFile.get().getName() + "\" under \"/"
                         + vault.getRoot().getPathOfEntry(currentDir.getId(), true) + "\"");
             } catch (IOException e) {
-                FxApp.getWindow().statusBar.showError("IO error when deleting entry: " + e.getMessage());
+                FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "deleting entry", e);
             }
         } else {
             FxApp.getWindow().statusBar.showError("No entry selected");
@@ -216,13 +213,13 @@ public class VaultExplorer extends BorderPane {
                 imageStage.setScene(new Scene(new BorderPane(imageView), 400, 400));
                 imageStage.show();
             } catch (IOException e) {
-                FxApp.getWindow().statusBar.showError("IO error when opening file: " + e.getMessage());
+                FxApp.getWindow().statusBar.showError(StatusBar.Error.IO, "opening file", e);
             } catch (CryptoException e) {
-                FxApp.getWindow().statusBar.showError("Crypto error when opening file (incorrect password?): "
-                        + e.getMessage());
+                FxApp.getWindow().statusBar.showError(StatusBar.Error.CRYPTO, "opening file", e);
             }
         } else {
-            FxApp.getWindow().statusBar.showError("Cannot open unsupported file \"" + file.getName() + "\"");
+            FxApp.getWindow().statusBar.showError(StatusBar.Error.DEFAULT, "opening unsupported file",
+                    new Exception("\"" + file.getName() + "\""));
         }
     }
 
