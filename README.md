@@ -6,6 +6,8 @@ stored in an encrypted container (a "vault"), users are able to add and delete f
 encryption occurs in the background. Encrypted vaults can be stored locally or synchronized with any cloud storage
 service. All aspects of the program are open source and client-side.
 
+![JVault User Interface](docs/JVault-0.4.0-main-stage.png)
+
 ## Rationale
 
 With the growing prevalence of cybersecurity threats that account for the majority of modern-day breaches of sensitive
@@ -58,7 +60,7 @@ As a user, I want to be able to:
 
 - Locate or create a "secret" file on your local drive (it could just be a .txt file containing data you can recognize)
 - Identify a folder on your local drive where the application can create a vault in
-- Either clone and build the source code yourself, or [download and double-click the standalone runnable JAR file](https://github.students.cs.ubc.ca/cpsc210-2019w-t2/project_d1z2b/releases)
+- Either clone and build the source code yourself, or [download and double-click the standalone runnable JAR file](https://github.com/premiumrich/jvault/releases)
 
 ### Interacting with the GUI (continue sequentially)
 
@@ -93,7 +95,7 @@ As a user, I want to be able to:
 
 The type hierarchy below exemplifies the composite pattern:
 
-![Filesystem type hierarchy](JVault-UML-Filesystem-Hierarchy.png)
+![Filesystem Type Hierarchy](docs/JVault-UML-Filesystem-Hierarchy.png)
 
 - *VaultEntry* is the component class, *VaultFile* is a leaf class, and *VaultDirectory* is the composite class that
   aggregates multiple *VaultEntry* objects in an *ArrayList*
@@ -124,4 +126,4 @@ Increase cohesion | Parts of *Reader* and *Writer* are not solely responsible fo
 
 ### Task 3: UML Design Diagram
 
-![JVault UML Design Diagram](JVault-UML-Design-Diagram.png)
+![JVault UML Design Diagram](docs/JVault-UML-Design-Diagram.png)
